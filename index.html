@@ -56,11 +56,10 @@
       pointer-events: none;
     }
 
-    /* === GIF OVERLAY — sits between canvas and HUD, no CORS canvas issues === */
+    /* === GIF OVERLAY — only shown after camera access === */
     #shiva-gif {
       display: none;
       position: absolute;
-      /* centered horizontally, upper portion of screen */
       left: 50%;
       top: 13%;
       transform: translateX(-50%);
@@ -198,8 +197,8 @@
   <video id="cam-video" autoplay playsinline muted></video>
   <canvas id="ar-canvas"></canvas>
 
-  <!-- GIF rendered as plain <img> — bypasses canvas CORS restrictions entirely -->
-  <img id="shiva-gif" alt="Lord Shiva" crossorigin="anonymous" />
+  <!-- GIF: src is empty until camera access is granted -->
+  <img id="shiva-gif" alt="Lord Shiva Good Morning" />
 
   <!-- HUD -->
   <div class="ar-top">
@@ -214,7 +213,7 @@
 </div>
 
 <script>
-  const SHIVA_GIF_SRC = 'https://media.tenor.com/8v7tL3z4z3MAAAAC/lord-shiva-transparent-background-greetings.gif';
+  const SHIVA_GIF_SRC = 'https://media1.tenor.com/m/dg6gAB452gkAAAAd/lord-shiva-good-morning.gif';
 
   let stream = null;
   let animFrame = null;
@@ -222,15 +221,8 @@
 
   function launchAR() {
     document.getElementById('landing').style.display = 'none';
-    document.body.style.overflow = 'hidden';
     document.getElementById('ar-loading').style.display = 'flex';
 
-    // Set GIF src directly on the <img> element — no canvas, no CORS taint
-    const gifEl = document.getElementById('shiva-gif');
-    gifEl.src = SHIVA_GIF_SRC;
-    gifEl.style.display = 'block';
-
-    // Start camera
     const constraints = {
       video: {
         facingMode: { ideal: 'environment' },
@@ -249,6 +241,12 @@
           video.play();
           document.getElementById('ar-loading').style.display = 'none';
           document.getElementById('ar-container').style.display = 'block';
+
+          // GIF is set and revealed ONLY after camera access is successfully granted
+          const gifEl = document.getElementById('shiva-gif');
+          gifEl.src = SHIVA_GIF_SRC;
+          gifEl.style.display = 'block';
+
           startAR();
         };
       })
@@ -278,7 +276,7 @@
 
     function draw(now) {
       animFrame = requestAnimationFrame(draw);
-      const elapsed = (now - startTime) / 1000; // seconds
+      const elapsed = (now - startTime) / 1000;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -290,7 +288,7 @@
       const glowY = H * 0.78;
       const glowRX = W * 0.38;
       const glowRY = H * 0.055;
-      const glowAngle = elapsed * (Math.PI * 2 / 18); // full rotation in 18s
+      const glowAngle = elapsed * (Math.PI * 2 / 18);
 
       ctx.save();
       ctx.translate(cx, glowY);
@@ -313,7 +311,7 @@
       const flameW = W * 0.04;
       drawFlame(ctx, flameX, flameBaseY, flameW, flameH, elapsed);
 
-      // === Radiant halo (canvas-only glow behind where the GIF <img> sits) ===
+      // === Radiant halo ===
       const haloX = W / 2;
       const haloY = H * 0.38;
       const haloGrd = ctx.createRadialGradient(haloX, haloY, 0, haloX, haloY, W * 0.38);
@@ -352,19 +350,10 @@
     ctx.shadowColor = '#ff4400';
     ctx.shadowBlur = 24;
 
-    // Outer flame
     ctx.beginPath();
     ctx.moveTo(x - w, baseY);
-    ctx.bezierCurveTo(
-      x - w * 1.1, baseY - h * 0.4,
-      x - w * 0.3, baseY - h * 0.7,
-      x, baseY - h
-    );
-    ctx.bezierCurveTo(
-      x + w * 0.3, baseY - h * 0.7,
-      x + w * 1.1, baseY - h * 0.4,
-      x + w, baseY
-    );
+    ctx.bezierCurveTo(x - w * 1.1, baseY - h * 0.4, x - w * 0.3, baseY - h * 0.7, x, baseY - h);
+    ctx.bezierCurveTo(x + w * 0.3, baseY - h * 0.7, x + w * 1.1, baseY - h * 0.4, x + w, baseY);
     ctx.closePath();
     const fg1 = ctx.createLinearGradient(x, baseY, x, baseY - h);
     fg1.addColorStop(0, 'rgba(255,80,0,0.95)');
@@ -373,19 +362,10 @@
     ctx.fillStyle = fg1;
     ctx.fill();
 
-    // Inner flame
     ctx.beginPath();
     ctx.moveTo(x - w * 0.4, baseY);
-    ctx.bezierCurveTo(
-      x - w * 0.3, baseY - h * 0.5,
-      x - w * 0.1, baseY - h * 0.75,
-      x, baseY - h * 0.92
-    );
-    ctx.bezierCurveTo(
-      x + w * 0.1, baseY - h * 0.75,
-      x + w * 0.3, baseY - h * 0.5,
-      x + w * 0.4, baseY
-    );
+    ctx.bezierCurveTo(x - w * 0.3, baseY - h * 0.5, x - w * 0.1, baseY - h * 0.75, x, baseY - h * 0.92);
+    ctx.bezierCurveTo(x + w * 0.1, baseY - h * 0.75, x + w * 0.3, baseY - h * 0.5, x + w * 0.4, baseY);
     ctx.closePath();
     const fg2 = ctx.createLinearGradient(x, baseY, x, baseY - h);
     fg2.addColorStop(0, 'rgba(255,200,0,0.9)');
@@ -396,7 +376,6 @@
     ctx.restore();
   }
 
-  // Simple deterministic spark particles
   const SPARK_COUNT = 18;
   const sparks = Array.from({length: SPARK_COUNT}, (_, i) => ({
     seed: i / SPARK_COUNT,
