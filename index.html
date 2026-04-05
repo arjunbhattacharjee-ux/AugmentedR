@@ -56,6 +56,31 @@
       pointer-events: none;
     }
 
+    /* === GIF OVERLAY — sits between canvas and HUD, no CORS canvas issues === */
+    #shiva-gif {
+      display: none;
+      position: absolute;
+      /* centered horizontally, upper portion of screen */
+      left: 50%;
+      top: 13%;
+      transform: translateX(-50%);
+      width: min(72vw, 420px);
+      height: auto;
+      z-index: 150;
+      pointer-events: none;
+      opacity: 0.98;
+      filter: drop-shadow(0 0 28px rgba(255,160,0,0.7)) drop-shadow(0 0 8px rgba(255,200,50,0.5));
+      animation: shiva-float 3.4s ease-in-out infinite, shiva-sway 4.8s ease-in-out infinite;
+    }
+    @keyframes shiva-float {
+      0%,100% { margin-top: 0px; }
+      50%      { margin-top: -18px; }
+    }
+    @keyframes shiva-sway {
+      0%,100% { transform: translateX(calc(-50% - 12px)); }
+      50%      { transform: translateX(calc(-50% + 12px)); }
+    }
+
     /* HUD */
     .ar-top {
       position: absolute;
@@ -173,6 +198,9 @@
   <video id="cam-video" autoplay playsinline muted></video>
   <canvas id="ar-canvas"></canvas>
 
+  <!-- GIF rendered as plain <img> — bypasses canvas CORS restrictions entirely -->
+  <img id="shiva-gif" alt="Lord Shiva" crossorigin="anonymous" />
+
   <!-- HUD -->
   <div class="ar-top">
     <div class="ar-logo">ॐ Shiva AR</div>
@@ -186,14 +214,10 @@
 </div>
 
 <script>
-  const SHIVA_GIF_SRC = 'https://media.tenor.com/5f5fK5zKz3MAAAAC/lord-shiva-mahadev.gif';
+  const SHIVA_GIF_SRC = 'https://media.tenor.com/8v7tL3z4z3MAAAAC/lord-shiva-transparent-background-greetings.gif';
 
   let stream = null;
   let animFrame = null;
-  let shivaGif = null;
-  let gifLoaded = false;
-
-  // Animation state
   let startTime = null;
 
   function launchAR() {
@@ -201,17 +225,10 @@
     document.body.style.overflow = 'hidden';
     document.getElementById('ar-loading').style.display = 'flex';
 
-    // Pre-load animated Shiva GIF — browsers auto-animate GIFs drawn via drawImage()
-    shivaGif = new Image();
-    shivaGif.crossOrigin = 'anonymous';
-    shivaGif.onload  = () => { gifLoaded = true; };
-    shivaGif.onerror = () => {
-      // Retry without crossOrigin (some CDNs drop the header)
-      shivaGif = new Image();
-      shivaGif.onload = () => { gifLoaded = true; };
-      shivaGif.src = SHIVA_GIF_SRC + '?t=' + Date.now();
-    };
-    shivaGif.src = SHIVA_GIF_SRC;
+    // Set GIF src directly on the <img> element — no canvas, no CORS taint
+    const gifEl = document.getElementById('shiva-gif');
+    gifEl.src = SHIVA_GIF_SRC;
+    gifEl.style.display = 'block';
 
     // Start camera
     const constraints = {
@@ -296,48 +313,19 @@
       const flameW = W * 0.04;
       drawFlame(ctx, flameX, flameBaseY, flameW, flameH, elapsed);
 
-      // === Lord Shiva animated GIF ===
-      const floatY = Math.sin(elapsed * (2 * Math.PI / 3.4)) * H * 0.012;
-      const swayX  = Math.sin(elapsed * (2 * Math.PI / 4.8)) * W * 0.015;
-      const gifH   = H * 0.60;
-      const aspect = (gifLoaded && shivaGif.naturalWidth && shivaGif.naturalHeight)
-        ? shivaGif.naturalWidth / shivaGif.naturalHeight
-        : 0.75; // portrait fallback
-      const gifW = aspect * gifH;
-      const gifX = cx + swayX - gifW / 2;
-      const gifY = H * 0.15 + floatY;
-
-      if (gifLoaded) {
-        // Radiant halo behind the GIF
-        const haloGrd = ctx.createRadialGradient(
-          cx + swayX, gifY + gifH * 0.28, 0,
-          cx + swayX, gifY + gifH * 0.28, gifW * 0.9
-        );
-        haloGrd.addColorStop(0,   'rgba(255,200,50,0.25)');
-        haloGrd.addColorStop(0.5, 'rgba(255,120,0,0.13)');
-        haloGrd.addColorStop(1,   'rgba(255,80,0,0)');
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(cx + swayX, gifY + gifH * 0.28, gifW * 0.9, gifH * 0.55, 0, 0, Math.PI * 2);
-        ctx.fillStyle = haloGrd;
-        ctx.fill();
-        ctx.restore();
-
-        // Draw the GIF frame (browser advances frames automatically)
-        ctx.save();
-        ctx.globalAlpha = 0.98;
-        ctx.drawImage(shivaGif, gifX, gifY, gifW, gifH);
-        ctx.restore();
-      } else {
-        // Placeholder OM while GIF loads
-        ctx.save();
-        ctx.font = `${H * 0.18}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'rgba(255,180,50,0.8)';
-        ctx.fillText('ॐ', cx, H * 0.42);
-        ctx.restore();
-      }
+      // === Radiant halo (canvas-only glow behind where the GIF <img> sits) ===
+      const haloX = W / 2;
+      const haloY = H * 0.38;
+      const haloGrd = ctx.createRadialGradient(haloX, haloY, 0, haloX, haloY, W * 0.38);
+      haloGrd.addColorStop(0,   'rgba(255,200,50,0.18)');
+      haloGrd.addColorStop(0.5, 'rgba(255,120,0,0.09)');
+      haloGrd.addColorStop(1,   'rgba(255,80,0,0)');
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(haloX, haloY, W * 0.38, H * 0.30, 0, 0, Math.PI * 2);
+      ctx.fillStyle = haloGrd;
+      ctx.fill();
+      ctx.restore();
 
       // === OM symbol above ===
       const omScale = 1 + 0.06 * Math.sin(elapsed * (2 * Math.PI / 2.4));
@@ -441,11 +429,12 @@
   function closeAR() {
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-    shivaGif = null;
+    const gifEl = document.getElementById('shiva-gif');
+    gifEl.src = '';
+    gifEl.style.display = 'none';
     document.getElementById('ar-container').style.display = 'none';
     document.getElementById('landing').style.display = 'flex';
     document.body.style.overflow = 'auto';
-    gifLoaded = false;
     startTime = null;
   }
 
