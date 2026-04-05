@@ -186,12 +186,12 @@
 </div>
 
 <script>
-  const SHIVA_IMG_SRC = 'https://pngimg.com/uploads/shiva/shiva_PNG23.png';
+  const SHIVA_VIDEO_SRC = 'https://cdn.pixabay.com/video/2021/01/15/62065-502737637_large.mp4';
 
   let stream = null;
   let animFrame = null;
-  let shivaImg = null;
-  let imgLoaded = false;
+  let shivaVideo = null;
+  let videoReady = false;
 
   // Animation state
   let startTime = null;
@@ -201,17 +201,19 @@
     document.body.style.overflow = 'hidden';
     document.getElementById('ar-loading').style.display = 'flex';
 
-    // Pre-load Shiva image
-    shivaImg = new Image();
-    shivaImg.crossOrigin = 'anonymous';
-    shivaImg.onload = () => { imgLoaded = true; };
-    shivaImg.onerror = () => {
-      // Fallback: try without crossOrigin
-      shivaImg = new Image();
-      shivaImg.onload = () => { imgLoaded = true; };
-      shivaImg.src = SHIVA_IMG_SRC;
-    };
-    shivaImg.src = SHIVA_IMG_SRC;
+    // Create hidden Shiva video element
+    shivaVideo = document.createElement('video');
+    shivaVideo.src = SHIVA_VIDEO_SRC;
+    shivaVideo.crossOrigin = 'anonymous';
+    shivaVideo.loop = true;
+    shivaVideo.muted = true;
+    shivaVideo.playsInline = true;
+    shivaVideo.setAttribute('playsinline', '');
+    shivaVideo.preload = 'auto';
+    shivaVideo.style.display = 'none';
+    document.body.appendChild(shivaVideo);
+    shivaVideo.addEventListener('canplay', () => { videoReady = true; shivaVideo.play().catch(()=>{}); }, { once: true });
+    shivaVideo.load();
 
     // Start camera
     const constraints = {
@@ -296,33 +298,37 @@
       const flameW = W * 0.04;
       drawFlame(ctx, flameX, flameBaseY, flameW, flameH, elapsed);
 
-      // === Lord Shiva image ===
+      // === Lord Shiva video ===
       const floatY = Math.sin(elapsed * (2 * Math.PI / 3.2)) * H * 0.012;
       const swayX = Math.sin(elapsed * (2 * Math.PI / 5.2)) * W * 0.015;
-      const imgH = H * 0.60;
-      const imgW = imgLoaded ? (shivaImg.naturalWidth / shivaImg.naturalHeight) * imgH : imgH * 0.6;
-      const imgX = cx + swayX - imgW / 2;
-      const imgY = H * 0.15 + floatY;
+      const vidH = H * 0.60;
+      // Use native aspect ratio once video metadata is available, else 16:9 fallback
+      const aspect = (shivaVideo && shivaVideo.videoWidth && shivaVideo.videoHeight)
+        ? shivaVideo.videoWidth / shivaVideo.videoHeight
+        : 16 / 9;
+      const vidW = aspect * vidH;
+      const vidX = cx + swayX - vidW / 2;
+      const vidY = H * 0.15 + floatY;
 
-      if (imgLoaded) {
-        // Halo / aura behind Shiva
-        const haloGrd = ctx.createRadialGradient(cx + swayX, imgY + imgH * 0.28, 0, cx + swayX, imgY + imgH * 0.28, imgW * 0.85);
+      if (videoReady && shivaVideo.readyState >= 2) {
+        // Halo / aura behind video
+        const haloGrd = ctx.createRadialGradient(cx + swayX, vidY + vidH * 0.28, 0, cx + swayX, vidY + vidH * 0.28, vidW * 0.85);
         haloGrd.addColorStop(0,   'rgba(255,200,50,0.22)');
         haloGrd.addColorStop(0.5, 'rgba(255,120,0,0.12)');
         haloGrd.addColorStop(1,   'rgba(255,80,0,0)');
         ctx.save();
         ctx.beginPath();
-        ctx.ellipse(cx + swayX, imgY + imgH * 0.28, imgW * 0.85, imgH * 0.55, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx + swayX, vidY + vidH * 0.28, vidW * 0.85, vidH * 0.55, 0, 0, Math.PI * 2);
         ctx.fillStyle = haloGrd;
         ctx.fill();
         ctx.restore();
 
         ctx.save();
-        ctx.globalAlpha = 0.97;
-        ctx.drawImage(shivaImg, imgX, imgY, imgW, imgH);
+        ctx.globalAlpha = 0.98;
+        ctx.drawImage(shivaVideo, vidX, vidY, vidW, vidH);
         ctx.restore();
       } else {
-        // Placeholder while image loads
+        // Placeholder OM while video buffers
         ctx.save();
         ctx.font = `${H * 0.18}px serif`;
         ctx.textAlign = 'center';
@@ -434,10 +440,11 @@
   function closeAR() {
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    if (shivaVideo) { shivaVideo.pause(); shivaVideo.remove(); shivaVideo = null; }
     document.getElementById('ar-container').style.display = 'none';
     document.getElementById('landing').style.display = 'flex';
     document.body.style.overflow = 'auto';
-    imgLoaded = false;
+    videoReady = false;
     startTime = null;
   }
 
