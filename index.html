@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lord Shiva AR Experience</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Cinzel', serif;
+      background: #0a0305;
+      color: #f0c060;
+      overflow-x: hidden;
+    }
+
+    /* ── LANDING SCREEN ── */
+    #landing {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 30%, #3d0a00 0%, #1a0510 40%, #0a0305 100%);
+      padding: 2rem;
+      text-align: center;
+      gap: 1.6rem;
+    }
+
+    /* Decorative Om top */
+    .om-symbol {
+      font-size: 4.5rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 24px #ff8c00) drop-shadow(0 0 48px #ff4500);
+      animation: pulse-glow 2.4s ease-in-out infinite;
+      color: #ffb347;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { filter: drop-shadow(0 0 16px #ff8c00) drop-shadow(0 0 32px #ff4500); opacity: 1; }
+      50%       { filter: drop-shadow(0 0 32px #ffd700) drop-shadow(0 0 64px #ff6600); opacity: 0.85; }
+    }
+
+    .main-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.8rem, 6vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffd700 0%, #ff8c00 40%, #ffd700 80%, #ff4500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      color: #c0845a;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    /* Decorative divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: min(340px, 90%);
+      color: #7a3e22;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #c0845a, transparent);
+    }
+
+    .description {
+      max-width: 480px;
+      font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+      color: #a07850;
+      line-height: 1.75;
+      letter-spacing: 0.04em;
+    }
+
+    /* Steps */
+    .steps {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(192,132,90,0.2);
+      border-radius: 16px;
+      padding: 1.4rem 1.8rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .steps h3 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      color: #ff8c00;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+      margin-bottom: 0.8rem;
+      font-size: 0.88rem;
+      color: #b08060;
+      line-height: 1.5;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff8c00, #c0440a);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .btn-launch {
+      position: relative;
+      padding: 1rem 2.8rem;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #fff;
+      background: linear-gradient(135deg, #c0440a 0%, #ff8c00 50%, #c0440a 100%);
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 0 24px rgba(255,140,0,0.5), 0 4px 20px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .btn-launch::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-launch:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 40px rgba(255,140,0,0.75), 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .btn-launch:hover::before { opacity: 1; }
+    .btn-launch:active { transform: scale(0.97); }
+
+    .marker-section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(192,132,90,0.2);
+      border-radius: 16px;
+      padding: 1.2rem 1.6rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .marker-section p {
+      font-size: 0.78rem;
+      color: #9a6040;
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    .marker-section a {
+      color: #ffb347;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* Decorative particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffb347, transparent);
+      animation: float-particle linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes float-particle {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.2; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    /* ── AR OVERLAY UI ── */
+    #ar-ui {
+      display: none;
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #ar-ui.visible { display: block; }
+
+    .ar-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(to bottom, rgba(10,3,5,0.85), transparent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ar-logo {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffd700;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 12px #ff8c00;
+    }
+
+    .ar-status {
+      font-size: 0.72rem;
+      color: #a08060;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .marker-hint {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 1.5rem;
+      background: linear-gradient(to top, rgba(10,3,5,0.9), transparent);
+      text-align: center;
+    }
+
+    .hint-text {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      color: #c0845a;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .hint-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      pointer-events: all;
+      background: rgba(192,68,10,0.7);
+      border: 1px solid rgba(255,140,0,0.4);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover { background: rgba(255,100,10,0.9); }
+
+    /* Scanning ring animation */
+    .scan-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px; height: 200px;
+      border: 2px solid rgba(255,140,0,0.4);
+      border-radius: 12px;
+      animation: scan-pulse 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan-pulse {
+      0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+      50%       { opacity: 0.8; transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    .scan-corner {
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: #ff8c00;
+      border-style: solid;
+    }
+
+    .scan-corner.tl { top: -1px; left: -1px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+    .scan-corner.tr { top: -1px; right: -1px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+    .scan-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+    .scan-corner.br { bottom: -1px; right: -1px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+    /* A-Frame scene */
+    a-scene {
+      display: none;
+    }
+
+    a-scene.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<!-- ── LANDING SCREEN ── -->
+<div id="landing">
+  <div class="om-symbol">ॐ</div>
+
+  <h1 class="main-title">Lord Shiva<br/>Augmented Reality</h1>
+  <p class="subtitle">Har Har Mahadev</p>
+
+  <div class="divider">✦</div>
+
+  <p class="description">
+    Experience the divine presence of Mahadeva in Augmented Reality.
+    Point your camera at a <strong style="color:#ffb347">Hiro marker</strong> to
+    summon the cosmic form of Lord Shiva in your physical world.
+  </p>
+
+  <div class="steps">
+    <h3>How to Experience</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <span>Print or display the Hiro marker on a second screen (link below)</span>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <span>Allow camera access when prompted by your browser</span>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <span>Point your camera at the marker and witness Shiva manifest</span>
+    </div>
+  </div>
+
+  <div class="marker-section">
+    <p>You'll need the Hiro AR marker:</p>
+    <a href="https://jeromeetienne.github.io/AR.js/data/images/hiro.png" target="_blank">
+      📥 View / Print Hiro Marker
+    </a>
+  </div>
+
+  <button class="btn-launch" onclick="launchAR()">
+    🔱 Begin AR Experience
+  </button>
+</div>
+
+<!-- ── AR UI OVERLAY ── -->
+<div id="ar-ui">
+  <div class="ar-header">
+    <div class="ar-logo">ॐ Shiva AR</div>
+    <div class="ar-status">Point at Hiro Marker</div>
+  </div>
+
+  <div class="scan-ring">
+    <div class="scan-corner tl"></div>
+    <div class="scan-corner tr"></div>
+    <div class="scan-corner bl"></div>
+    <div class="scan-corner br"></div>
+  </div>
+
+  <div class="marker-hint">
+    <div class="hint-icon">🔱</div>
+    <p class="hint-text">Aim camera at the Hiro Marker</p>
+  </div>
+
+  <button class="close-btn" onclick="closeAR()" title="Close AR">✕</button>
+</div>
+
+<!-- ── A-FRAME AR SCENE ── -->
+<a-scene id="arScene"
+  embedded
+  arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+  vr-mode-ui="enabled: false"
+  renderer="logarithmicDepthBuffer: true; physicallyCorrectLights: true; antialias: true;"
+  loading-screen="dotsColor: #ff8c00; backgroundColor: #0a0305">
+
+  <a-assets>
+    <!-- Pre-load a Shiva image texture for the panel -->
+    <img id="shivaImg"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Shaiva.jpg/400px-Shaiva.jpg"
+      crossorigin="anonymous" />
+  </a-assets>
+
+  <a-marker preset="hiro" id="marker">
+
+    <!-- === DIVINE LIGHT BASE === -->
+    <a-entity id="shiva-root" position="0 0 0">
+
+      <!-- Glowing ground disc -->
+      <a-cylinder
+        position="0 0.01 0"
+        radius="0.7" height="0.02"
+        material="color: #ff8c00; emissive: #ff4400; emissiveIntensity: 0.6; transparent: true; opacity: 0.55; side: double;">
+        <a-animation attribute="rotation" from="0 0 0" to="0 360 0" dur="12000" easing="linear" repeat="indefinite"></a-animation>
+      </a-cylinder>
+
+      <!-- Sacred Trishul (Trident) - main symbol -->
+      <!-- Central staff -->
+      <a-cylinder
+        position="0 0.55 0"
+        radius="0.025" height="1.1"
+        material="color: #c8a000; emissive: #886600; emissiveIntensity: 0.4; metalness: 0.9; roughness: 0.1;">
+      </a-cylinder>
+
+      <!-- Trishul prongs - center -->
+      <a-cylinder
+        position="0 1.25 0"
+        radius="0.022" height="0.45"
+        material="color: #ffd700; emissive: #aa7700; emissiveIntensity: 0.5; metalness: 1; roughness: 0.05;">
+      </a-cylinder>
+
+      <!-- Trishul prong - left -->
+      <a-cylinder
+        position="-0.12 1.18 0"
+        radius="0.016" height="0.35"
+        rotation="0 0 8"
+        material="color: #ffd700; emissive: #aa7700; emissiveIntensity: 0.5; metalness: 1; roughness: 0.05;">
+      </a-cylinder>
+
+      <!-- Trishul prong - right -->
+      <a-cylinder
+        position="0.12 1.18 0"
+        radius="0.016" height="0.35"
+        rotation="0 0 -8"
+        material="color: #ffd700; emissive: #aa7700; emissiveIntensity: 0.5; metalness: 1; roughness: 0.05;">
+      </a-cylinder>
+
+      <!-- Base blade of trishul -->
+      <a-cone
+        position="0 1.47 0"
+        radius-bottom="0.045" radius-top="0.005" height="0.12"
+        material="color: #ffd700; emissive: #cc8800; emissiveIntensity: 0.6; metalness: 1; roughness: 0;">
+      </a-cone>
+
+      <!-- Left blade tip -->
+      <a-cone
+        position="-0.12 1.37 0"
+        radius-bottom="0.03" radius-top="0.003" height="0.08"
+        rotation="0 0 8"
+        material="color: #ffd700; emissive: #cc8800; emissiveIntensity: 0.6; metalness: 1;">
+      </a-cone>
+
+      <!-- Right blade tip -->
+      <a-cone
+        position="0.12 1.37 0"
+        radius-bottom="0.03" radius-top="0.003" height="0.08"
+        rotation="0 0 -8"
+        material="color: #ffd700; emissive: #cc8800; emissiveIntensity: 0.6; metalness: 1;">
+      </a-cone>
+
+      <!-- === DAMARU (Drum) === -->
+      <a-entity position="-0.38 0.65 0">
+        <a-cone position="0 0.06 0" radius-bottom="0.09" radius-top="0.03" height="0.12"
+          material="color: #8B4513; emissive: #4a1a00; emissiveIntensity: 0.3; metalness: 0.3;">
+        </a-cone>
+        <a-cone position="0 -0.06 0" radius-bottom="0.09" radius-top="0.03" height="0.12"
+          rotation="180 0 0"
+          material="color: #8B4513; emissive: #4a1a00; emissiveIntensity: 0.3; metalness: 0.3;">
+        </a-cone>
+        <!-- Drum membrane rings -->
+        <a-torus position="0 0.12 0" radius="0.09" radius-tubular="0.008"
+          material="color: #d4a017; emissive: #886600; emissiveIntensity: 0.5; metalness: 0.8;">
+        </a-torus>
+        <a-torus position="0 -0.12 0" radius="0.09" radius-tubular="0.008"
+          material="color: #d4a017; emissive: #886600; emissiveIntensity: 0.5; metalness: 0.8;">
+        </a-torus>
+        <!-- Spin animation -->
+        <a-animation attribute="rotation" from="0 0 0" to="0 360 0" dur="5000" easing="linear" repeat="indefinite"></a-animation>
+      </a-entity>
+
+      <!-- === CRESCENT MOON above trishul === -->
+      <a-torus
+        position="0 1.65 0"
+        radius="0.09" radius-tubular="0.015"
+        arc="180"
+        rotation="0 0 -90"
+        material="color: #e8e8f0; emissive: #a0a0c8; emissiveIntensity: 0.8; metalness: 0.5;">
+      </a-torus>
+
+      <!-- === SNAKE (Vasuki) coil === -->
+      <a-torus
+        position="0 0.22 0"
+        radius="0.28" radius-tubular="0.028"
+        rotation="-15 45 0"
+        arc="340"
+        material="color: #3a7a3a; emissive: #1a4a1a; emissiveIntensity: 0.4; roughness: 0.7;">
+        <a-animation attribute="rotation" from="-15 0 0" to="-15 360 0" dur="18000" easing="linear" repeat="indefinite"></a-animation>
+      </a-torus>
+
+      <!-- Snake head -->
+      <a-sphere
+        position="0.28 0.3 0.05"
+        radius="0.045"
+        material="color: #2d6e2d; emissive: #0a3a0a; emissiveIntensity: 0.3;">
+      </a-sphere>
+
+      <!-- === SACRED FLAME === -->
+      <a-entity position="0 0 0">
+        <a-cone
+          position="0 0.12 0"
+          radius-bottom="0.06" radius-top="0.005" height="0.22"
+          material="color: #ff6600; emissive: #ff2200; emissiveIntensity: 1; transparent: true; opacity: 0.8; side: double;">
+          <a-animation attribute="scale" from="1 1 1" to="0.8 1.15 0.8" dur="600" direction="alternate" easing="easeInOutSine" repeat="indefinite"></a-animation>
+          <a-animation attribute="material.color" from="#ff6600" to="#ffcc00" dur="900" direction="alternate" repeat="indefinite"></a-animation>
+        </a-cone>
+        <a-cone
+          position="0 0.18 0"
+          radius-bottom="0.035" radius-top="0.003" height="0.15"
+          material="color: #ffe066; emissive: #ffaa00; emissiveIntensity: 1; transparent: true; opacity: 0.6; side: double;">
+          <a-animation attribute="scale" from="1 1 1" to="0.7 1.2 0.7" dur="450" direction="alternate" easing="easeInOutSine" repeat="indefinite"></a-animation>
+        </a-cone>
+      </a-entity>
+
+      <!-- === GLOWING OM symbol (text) === -->
+      <a-text
+        value="ॐ"
+        position="-0.01 0.78 0.04"
+        scale="0.5 0.5 0.5"
+        align="center"
+        color="#ffd700"
+        width="3">
+        <a-animation attribute="scale" from="0.5 0.5 0.5" to="0.55 0.55 0.55" dur="2000" direction="alternate" easing="easeInOutSine" repeat="indefinite"></a-animation>
+      </a-text>
+
+      <!-- === ORBIT PARTICLES (divine energy) === -->
+      <a-entity id="orbit1">
+        <a-sphere position="0.5 0.4 0" radius="0.04"
+          material="color: #ff8c00; emissive: #ff4400; emissiveIntensity: 1; transparent: true; opacity: 0.9;">
+        </a-sphere>
+        <a-animation attribute="rotation" from="0 0 0" to="0 360 0" dur="3000" easing="linear" repeat="indefinite"></a-animation>
+      </a-entity>
+
+      <a-entity id="orbit2" rotation="0 120 0">
+        <a-sphere position="0.45 0.55 0" radius="0.03"
+          material="color: #ff4500; emissive: #cc2200; emissiveIntensity: 1; transparent: true; opacity: 0.8;">
+        </a-sphere>
+        <a-animation attribute="rotation" from="0 120 0" to="0 480 0" dur="4000" easing="linear" repeat="indefinite"></a-animation>
+      </a-entity>
+
+      <a-entity id="orbit3" rotation="0 240 0">
+        <a-sphere position="0.4 0.7 0" radius="0.025"
+          material="color: #ffcc00; emissive: #aa8800; emissiveIntensity: 1; transparent: true; opacity: 0.85;">
+        </a-sphere>
+        <a-animation attribute="rotation" from="0 240 0" to="0 600 0" dur="5000" easing="linear" repeat="indefinite"></a-animation>
+      </a-entity>
+
+      <!-- === DIVINE LIGHT PILLAR === -->
+      <a-cylinder
+        position="0 0.75 0"
+        radius="0.04" height="1.5"
+        material="color: #ffffff; emissive: #ffcc66; emissiveIntensity: 0.9; transparent: true; opacity: 0.08; side: double;">
+      </a-cylinder>
+
+      <!-- Outer glow ring (pulsing halo) -->
+      <a-torus
+        position="0 0.05 0"
+        radius="0.5" radius-tubular="0.015"
+        rotation="-90 0 0"
+        material="color: #ff8c00; emissive: #ff4400; emissiveIntensity: 0.8; transparent: true; opacity: 0.6;">
+        <a-animation attribute="scale" from="1 1 1" to="1.15 1.15 1.15" dur="1800" direction="alternate" easing="easeInOutSine" repeat="indefinite"></a-animation>
+        <a-animation attribute="material.opacity" from="0.6" to="0.15" dur="1800" direction="alternate" repeat="indefinite"></a-animation>
+      </a-torus>
+
+      <!-- Inner ring -->
+      <a-torus
+        position="0 0.05 0"
+        radius="0.3" radius-tubular="0.01"
+        rotation="-90 0 0"
+        material="color: #ffd700; emissive: #ffaa00; emissiveIntensity: 1; transparent: true; opacity: 0.8;">
+        <a-animation attribute="rotation" from="-90 0 0" to="-90 360 0" dur="8000" easing="linear" repeat="indefinite"></a-animation>
+      </a-torus>
+
+      <!-- === NAME LABEL === -->
+      <a-text
+        value="LORD SHIVA"
+        position="0 -0.25 0"
+        scale="0.55 0.55 0.55"
+        align="center"
+        color="#ffd700"
+        width="3.5">
+      </a-text>
+
+      <a-text
+        value="HAR HAR MAHADEV"
+        position="0 -0.42 0"
+        scale="0.32 0.32 0.32"
+        align="center"
+        color="#c0845a"
+        width="4.5">
+        <a-animation attribute="material.opacity" from="0" to="1" dur="2000" direction="alternate" repeat="indefinite"></a-animation>
+      </a-text>
+
+      <!-- Lights -->
+      <a-light type="point" position="0 1.5 0.3" color="#ff8c00" intensity="1.8" distance="3"></a-light>
+      <a-light type="point" position="0.5 0.5 0.5" color="#ffd700" intensity="0.9" distance="2"></a-light>
+      <a-light type="ambient" color="#2a1a00" intensity="0.6"></a-light>
+
+    </a-entity><!-- end shiva-root -->
+  </a-marker>
+
+  <a-entity camera></a-entity>
+</a-scene>
+
+<script>
+  // ── Floating particles on landing ──
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 6 + 2;
+    p.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${Math.random() * 100}%;
+      animation-duration: ${Math.random() * 8 + 6}s;
+      animation-delay: ${Math.random() * 8}s;
+    `;
+    container.appendChild(p);
+  }
+
+  // ── Launch AR ──
+  function launchAR() {
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('ar-ui').classList.add('visible');
+
+    const scene = document.getElementById('arScene');
+    scene.classList.add('active');
+    scene.style.display = 'block';
+    scene.style.position = 'fixed';
+    scene.style.inset = '0';
+    scene.style.width = '100%';
+    scene.style.height = '100%';
+    scene.style.zIndex = '500';
+  }
+
+  // ── Close AR ──
+  function closeAR() {
+    document.getElementById('ar-ui').classList.remove('visible');
+
+    const scene = document.getElementById('arScene');
+    scene.style.display = 'none';
+    scene.classList.remove('active');
+
+    document.getElementById('landing').style.display = 'flex';
+  }
+
+  // ── Hide scan ring when marker found ──
+  document.addEventListener('DOMContentLoaded', () => {
+    const marker = document.getElementById('marker');
+    const scanRing = document.querySelector('.scan-ring');
+    const arStatus = document.querySelector('.ar-status');
+
+    if (marker) {
+      marker.addEventListener('markerFound', () => {
+        scanRing.style.opacity = '0';
+        arStatus.textContent = '✦ Shiva Manifested ✦';
+        arStatus.style.color = '#ffd700';
+      });
+
+      marker.addEventListener('markerLost', () => {
+        scanRing.style.opacity = '1';
+        arStatus.textContent = 'Point at Hiro Marker';
+        arStatus.style.color = '#a08060';
+      });
+    }
+  });
+</script>
+</body>
+</html>
