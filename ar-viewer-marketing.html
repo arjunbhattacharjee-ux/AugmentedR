@@ -3,763 +3,532 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ARDrop — See It Before You Place It</title>
+  <title>ARDrop — See It In Your Space</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ink: #0a0a0f;
-      --ink2: #13131a;
-      --surface: #16161f;
-      --border: rgba(255,255,255,0.07);
-      --accent: #b8f04a;
-      --accent2: #4af0b8;
-      --white: #f5f4ef;
-      --muted: rgba(245,244,239,0.45);
-      --radius: 16px;
+      --white: #ffffff;
+      --off: #f5f5f7;
+      --light: #fbfbfd;
+      --border: #d2d2d7;
+      --border-light: #e8e8ed;
+      --ink: #1d1d1f;
+      --mid: #6e6e73;
+      --soft: #a1a1a6;
+      --accent: #0071e3;
+      --accent-hover: #0077ed;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
     }
 
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
 
     body {
-      background: var(--ink);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--ink);
+      font-family: 'Geist', sans-serif;
       font-weight: 400;
       overflow-x: hidden;
-      cursor: default;
     }
 
-    /* ── NOISE OVERLAY ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: .5;
-    }
-
-    /* ── NAV ── */
+    /* ─── NAV ─── */
     nav {
-      position: fixed; top: 0; left: 0; right: 0;
-      z-index: 500;
-      padding: 1.2rem 2.5rem;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      height: 52px;
       display: flex; align-items: center; justify-content: space-between;
-      background: rgba(10,10,15,0.75);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
     }
-    .nav-logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.35rem;
-      letter-spacing: -.02em;
-      color: var(--white);
-    }
-    .nav-logo span { color: var(--accent); }
+    .nav-logo { font-weight: 600; font-size: 1.05rem; letter-spacing: -.02em; color: var(--ink); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: .8rem; color: var(--mid); text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--ink); }
     .nav-cta {
-      background: var(--accent);
-      color: var(--ink);
-      border: none;
-      border-radius: 50px;
-      padding: .55rem 1.4rem;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: .88rem;
-      cursor: pointer;
-      letter-spacing: .01em;
-      transition: transform .15s, box-shadow .15s;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 50px; padding: .42rem 1.1rem;
+      font-family: 'Geist', sans-serif; font-weight: 500; font-size: .8rem;
+      cursor: pointer; letter-spacing: -.01em; transition: background .15s;
+      text-decoration: none;
     }
-    .nav-cta:hover { transform: scale(1.04); box-shadow: 0 0 24px rgba(184,240,74,.35); }
+    .nav-cta:hover { background: var(--accent-hover); }
+    @media (max-width: 640px) { .nav-links { display: none; } }
 
-    /* ── HERO ── */
+    /* ─── HERO ─── */
     #hero {
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 7rem 1.5rem 4rem;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      padding: 8rem 1.5rem 5rem;
+      background: var(--light);
+      position: relative; overflow: hidden;
     }
-
-    .hero-glow {
-      position: absolute;
-      width: 700px; height: 700px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(184,240,74,.12) 0%, transparent 65%);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -55%);
-      pointer-events: none;
-    }
-    .hero-glow2 {
-      position: absolute;
-      width: 500px; height: 500px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(74,240,184,.07) 0%, transparent 65%);
-      bottom: -10%; right: -10%;
+    #hero::before {
+      content: '';
+      position: absolute; width: 900px; height: 900px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,113,227,.055) 0%, transparent 65%);
+      top: 50%; left: 50%; transform: translate(-50%, -58%);
       pointer-events: none;
     }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      background: rgba(184,240,74,.1);
-      border: 1px solid rgba(184,240,74,.25);
-      border-radius: 50px;
-      padding: .35rem 1rem;
-      font-size: .75rem;
-      font-weight: 500;
-      color: var(--accent);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      margin-bottom: 1.8rem;
-      animation: fadeUp .6s ease both;
+    .hero-eyebrow {
+      font-size: .72rem; font-weight: 500; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 1.4rem;
+      opacity: 0; animation: rise .6s .1s ease forwards;
     }
-    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.8s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
     h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(3rem, 8vw, 6.5rem);
-      line-height: .97;
-      letter-spacing: -.03em;
-      max-width: 900px;
-      animation: fadeUp .7s .1s ease both;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      font-weight: 400; line-height: .95; letter-spacing: -.03em;
+      color: var(--ink); max-width: 820px;
+      opacity: 0; animation: rise .7s .2s ease forwards;
     }
-    h1 em { font-style: italic; color: var(--accent); }
+    h1 i { font-style: italic; color: var(--accent); }
 
     .hero-sub {
-      font-size: clamp(.95rem, 2vw, 1.15rem);
-      color: var(--muted);
-      max-width: 560px;
-      line-height: 1.7;
-      margin-top: 1.5rem;
-      font-weight: 300;
-      animation: fadeUp .7s .2s ease both;
+      font-size: clamp(.95rem, 1.8vw, 1.15rem); font-weight: 300; color: var(--mid);
+      max-width: 520px; line-height: 1.75; margin-top: 1.6rem;
+      opacity: 0; animation: rise .7s .3s ease forwards;
+    }
+    .hero-actions {
+      display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center;
+      margin-top: 2.4rem;
+      opacity: 0; animation: rise .7s .4s ease forwards;
+    }
+    .btn-blue {
+      background: var(--accent); color: #fff; border: none; border-radius: 50px;
+      padding: .75rem 1.8rem; font-family: 'Geist', sans-serif;
+      font-weight: 500; font-size: .95rem; cursor: pointer;
+      transition: background .15s, box-shadow .15s; text-decoration: none; display: inline-block;
+    }
+    .btn-blue:hover { background: var(--accent-hover); box-shadow: 0 4px 20px rgba(0,113,227,.3); }
+    .btn-outline {
+      background: transparent; color: var(--accent);
+      border: 1.5px solid var(--border); border-radius: 50px;
+      padding: .75rem 1.8rem; font-family: 'Geist', sans-serif;
+      font-weight: 500; font-size: .95rem; cursor: pointer;
+      transition: border-color .15s; text-decoration: none; display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--accent); }
+
+    .hero-pills {
+      display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center;
+      margin-top: 2rem; opacity: 0; animation: rise .7s .5s ease forwards;
+    }
+    .pill {
+      border: 1px solid var(--border-light); border-radius: 50px;
+      padding: .28rem .85rem; font-size: .72rem; color: var(--mid); background: var(--white);
+    }
+    .hero-visual {
+      margin-top: 4rem; width: min(960px, 92vw);
+      opacity: 0; animation: rise .8s .6s ease forwards;
+    }
+    .mockup-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .mockup-cell { position: relative; height: 220px; overflow: hidden; }
+    .mockup-cell img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .5s ease; filter: saturate(.9);
+    }
+    .mockup-cell:hover img { transform: scale(1.04); filter: saturate(1.1); }
+    .mockup-label {
+      position: absolute; bottom: 10px; left: 12px;
+      font-size: .65rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+      color: rgba(255,255,255,.9); background: rgba(0,0,0,.28);
+      backdrop-filter: blur(6px); padding: .22rem .6rem; border-radius: 50px;
+    }
+    @media (max-width: 640px) {
+      .mockup-strip { grid-template-columns: repeat(2,1fr); }
+      .mockup-cell { height: 140px; }
+    }
+    @keyframes rise { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+
+    /* ─── LAYOUT HELPERS ─── */
+    .section { padding: 6rem 1.5rem; max-width: 1080px; margin: 0 auto; }
+    .section-full {
+      padding: 6rem 1.5rem;
+      background: var(--off);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .section-full-inner { max-width: 1080px; margin: 0 auto; }
+    .section-tag {
+      font-size: .68rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: .9rem;
+    }
+    .section-h {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 400;
+      line-height: 1.05; letter-spacing: -.025em; color: var(--ink); max-width: 640px;
+    }
+    .section-h i { font-style: italic; color: var(--accent); }
+    .section-body {
+      font-size: .95rem; color: var(--mid); line-height: 1.75;
+      max-width: 500px; margin-top: .9rem; font-weight: 300;
     }
 
-    .hero-btns {
-      display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
-      margin-top: 2.5rem;
-      animation: fadeUp .7s .3s ease both;
+    /* ─── BENTO GRID ─── */
+    .bento {
+      display: grid; grid-template-columns: repeat(12, 1fr);
+      gap: 12px; margin-top: 3.5rem;
     }
-    .btn-primary {
-      background: var(--accent);
-      color: var(--ink);
-      border: none; border-radius: 50px;
-      padding: .85rem 2.2rem;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600; font-size: 1rem;
-      cursor: pointer; transition: transform .15s, box-shadow .15s;
-      text-decoration: none; display: inline-block;
+    .bento-card {
+      background: var(--white); border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg); overflow: hidden;
+      cursor: pointer; position: relative;
+      transition: box-shadow .2s, transform .2s;
     }
-    .btn-primary:hover { transform: scale(1.04); box-shadow: 0 0 32px rgba(184,240,74,.4); }
-    .btn-ghost {
-      background: transparent;
-      color: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .85rem 2.2rem;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500; font-size: 1rem;
-      cursor: pointer; transition: border-color .2s;
-      text-decoration: none; display: inline-block;
-    }
-    .btn-ghost:hover { border-color: rgba(255,255,255,.25); }
+    .bento-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,.09); transform: translateY(-2px); }
+    .bc-1 { grid-column: span 7; }
+    .bc-2 { grid-column: span 5; }
+    .bc-3 { grid-column: span 4; }
+    .bc-4 { grid-column: span 4; }
+    .bc-5 { grid-column: span 4; }
+    @media (max-width: 900px) { .bc-1,.bc-2,.bc-3,.bc-4,.bc-5 { grid-column: span 12; } }
 
-    /* floating tags */
-    .hero-tags {
-      display: flex; gap: .6rem; flex-wrap: wrap; justify-content: center;
-      margin-top: 2rem;
-      animation: fadeUp .7s .4s ease both;
+    .bento-img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+      transition: transform .4s ease; filter: saturate(.88);
     }
-    .tag {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .35rem .9rem;
-      font-size: .78rem;
-      color: var(--muted);
-    }
+    .bc-1 .bento-img { aspect-ratio: 4/3; }
+    .bento-card:hover .bento-img { transform: scale(1.03); filter: saturate(1); }
+    .bento-body { padding: 1.3rem 1.4rem 1.5rem; }
+    .bento-cat { font-size: .65rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .45rem; }
+    .bento-name { font-family: 'Instrument Serif', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: -.01em; color: var(--ink); margin-bottom: .35rem; }
+    .bento-desc { font-size: .82rem; color: var(--mid); line-height: 1.65; font-weight: 300; }
+    .bento-cta { display: inline-flex; align-items: center; gap: .3rem; margin-top: .9rem; font-size: .78rem; font-weight: 500; color: var(--accent); }
+    .bento-cta::after { content: '→'; transition: transform .15s; }
+    .bento-card:hover .bento-cta::after { transform: translateX(3px); }
 
-    @keyframes fadeUp {
-      from { opacity:0; transform: translateY(20px); }
-      to   { opacity:1; transform: translateY(0); }
+    /* ─── INDUSTRIES ─── */
+    .industries-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1px; border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg); overflow: hidden; margin-top: 3rem;
     }
+    .ind-cell { background: var(--white); padding: 1.6rem 1.5rem; transition: background .15s; }
+    .ind-cell:hover { background: #fafafa; }
+    .ind-icon { font-size: 1.5rem; margin-bottom: .7rem; }
+    .ind-name { font-weight: 500; font-size: .92rem; color: var(--ink); margin-bottom: .35rem; }
+    .ind-text { font-size: .78rem; color: var(--mid); line-height: 1.6; font-weight: 300; }
 
-    /* ── SECTION COMMON ── */
-    section { padding: 6rem 1.5rem; }
-    .section-label {
-      font-family: 'Syne', sans-serif;
-      font-size: .7rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
-    .section-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      line-height: 1.05;
-      letter-spacing: -.02em;
-      max-width: 700px;
-    }
-    .section-title em { font-style: italic; color: var(--accent); }
+    /* ─── DEMO ─── */
+    #demo { background: var(--white); padding: 6rem 1.5rem; }
+    .demo-inner { max-width: 580px; margin: 0 auto; }
+    .demo-header { text-align: center; margin-bottom: 2.5rem; }
 
-    /* ── USE CASES ── */
-    #use-cases { background: var(--ink); }
+    .demo-card {
+      background: var(--light); border: 1px solid var(--border-light); border-radius: 24px; overflow: hidden;
+    }
+    .demo-card-head {
+      padding: 1.1rem 1.6rem; border-bottom: 1px solid var(--border-light);
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .traffic-lights { display: flex; gap: .4rem; }
+    .tl { width: 11px; height: 11px; border-radius: 50%; }
+    .tl-r { background: #ff5f57; } .tl-y { background: #febc2e; } .tl-g { background: #28c840; }
+    .demo-card-title { font-size: .78rem; color: var(--mid); }
+    .demo-body { padding: 1.8rem 1.6rem; }
 
-    .cases-header { text-align: center; margin-bottom: 4rem; }
-    .cases-header .section-title { margin: 0 auto; }
-
-    .cases-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5px;
-      max-width: 1200px;
-      margin: 0 auto;
-      background: var(--border);
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      overflow: hidden;
-    }
-
-    .case-card {
-      background: var(--ink2);
-      padding: 0;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      transition: background .2s;
-    }
-    .case-card:hover { background: var(--surface); }
-    .case-card:hover .case-try { opacity: 1; transform: translateY(0); }
-
-    .case-img-wrap {
-      height: 200px;
-      overflow: hidden;
-      position: relative;
-    }
-    .case-img-wrap img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform .4s ease;
-      filter: saturate(.85);
-    }
-    .case-card:hover .case-img-wrap img { transform: scale(1.04); filter: saturate(1); }
-
-    .case-chip {
-      position: absolute;
-      top: 12px; left: 12px;
-      background: rgba(10,10,15,.75);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .25rem .7rem;
-      font-size: .68rem;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-
-    .case-body { padding: 1.4rem 1.5rem 1.6rem; }
-    .case-icon { font-size: 1.6rem; margin-bottom: .6rem; }
-    .case-name {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: .4rem;
-    }
-    .case-desc { font-size: .83rem; color: var(--muted); line-height: 1.6; }
-
-    .case-try {
-      display: inline-block;
-      margin-top: 1rem;
-      font-size: .78rem;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity .2s, transform .2s;
-    }
-
-    /* ── MORE USE CASES LIST ── */
-    #more-cases {
-      background: var(--ink2);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .more-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1rem;
-      max-width: 1100px;
-      margin: 3rem auto 0;
-    }
-    .more-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.2rem 1.4rem;
-      display: flex; gap: .9rem; align-items: flex-start;
-      transition: border-color .2s;
-    }
-    .more-card:hover { border-color: rgba(184,240,74,.25); }
-    .more-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: .1rem; }
-    .more-title { font-family:'Syne',sans-serif; font-weight:600; font-size:.9rem; margin-bottom:.3rem; }
-    .more-text { font-size:.78rem; color:var(--muted); line-height:1.55; }
-
-    /* ── HOW IT WORKS ── */
-    #how { background: var(--ink); }
-    .how-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    .steps-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 2px;
-      margin-top: 3.5rem;
-      background: var(--border);
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .step-card {
-      background: var(--ink2);
-      padding: 2rem 1.5rem;
-    }
-    .step-num {
-      font-family: 'DM Serif Display', serif;
-      font-size: 3rem;
-      color: rgba(184,240,74,.2);
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-    .step-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:.5rem; }
-    .step-text { font-size:.82rem; color:var(--muted); line-height:1.6; }
-
-    /* ── TRY IT ── */
-    #try-it {
-      background: var(--ink);
-    }
-    .try-wrap {
-      max-width: 640px;
-      margin: 0 auto;
-      background: var(--ink2);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      overflow: hidden;
-    }
-
-    .try-header {
-      padding: 2rem 2rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .try-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; }
-    .try-sub { font-size:.82rem; color:var(--muted); margin-top:.3rem; }
-
-    .try-body { padding: 2rem; }
-
-    /* Upload zone */
     #upload-zone {
-      border: 2px dashed rgba(184,240,74,.3);
-      border-radius: 14px;
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-      position: relative;
+      border: 1.5px dashed var(--border); border-radius: var(--radius-md);
+      padding: 2.2rem 1.5rem; text-align: center; cursor: pointer;
+      transition: border-color .2s, background .2s; position: relative; background: var(--white);
     }
-    #upload-zone:hover, #upload-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(184,240,74,.04);
-    }
-    #upload-zone input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .upload-icon { font-size: 2.4rem; margin-bottom: .6rem; }
-    .upload-label { font-weight: 600; color: var(--white); font-size: .95rem; }
-    .upload-hint  { font-size: .75rem; color: var(--muted); margin-top: .4rem; }
+    #upload-zone:hover, #upload-zone.drag-over { border-color: var(--accent); background: rgba(0,113,227,.025); }
+    #upload-zone input[type="file"] { position: absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .upload-icon { font-size: 2rem; margin-bottom: .5rem; opacity: .4; }
+    .upload-label { font-weight: 500; font-size: .92rem; color: var(--ink); }
+    .upload-sub { font-size: .75rem; color: var(--soft); margin-top: .3rem; }
 
-    /* Sample images */
-    .samples-label {
-      font-size: .7rem;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin: 1.5rem 0 .8rem;
-      text-align: center;
+    .samples-divider {
+      display: flex; align-items: center; gap: .8rem; margin: 1.4rem 0 .9rem;
     }
-    .samples-row {
-      display: flex; gap: .7rem; flex-wrap: wrap; justify-content: center;
-    }
-    .sample-btn {
-      display: flex; flex-direction: column; align-items: center; gap: .4rem;
-      cursor: pointer;
-      transition: transform .15s;
-      background: none; border: none;
-    }
-    .sample-btn:hover { transform: scale(1.06); }
+    .samples-divider::before, .samples-divider::after { content:''; flex:1; height:1px; background: var(--border-light); }
+    .samples-divider span { font-size: .68rem; color: var(--soft); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+
+    .samples-row { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+    .sample-btn { display: flex; flex-direction: column; align-items: center; gap: .4rem; background: none; border: none; cursor: pointer; transition: transform .15s; }
+    .sample-btn:hover { transform: scale(1.05); }
     .sample-thumb {
-      width: 72px; height: 72px;
-      border-radius: 10px;
-      object-fit: cover;
-      border: 2px solid transparent;
-      transition: border-color .15s;
+      width: 68px; height: 68px; border-radius: var(--radius-sm);
+      object-fit: cover; border: 1.5px solid var(--border-light);
+      transition: border-color .15s, box-shadow .15s;
     }
-    .sample-btn:hover .sample-thumb { border-color: var(--accent); }
-    .sample-caption { font-size: .65rem; color: var(--muted); letter-spacing: .04em; }
+    .sample-btn:hover .sample-thumb { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+    .sample-cap { font-size: .65rem; color: var(--mid); }
 
-    /* Preview */
-    #preview-wrap {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      text-align: center;
+    #preview-wrap { display: none; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+    #preview-img { max-width: 100%; max-height: 200px; border-radius: var(--radius-md); border: 1px solid var(--border-light); object-fit: contain; }
+    #preview-name { font-size: .75rem; color: var(--soft); }
+    .preview-row { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: center; }
+    .btn-ar {
+      background: var(--accent); color: #fff; border: none; border-radius: 50px;
+      padding: .7rem 1.6rem; font-family: 'Geist', sans-serif; font-weight: 500; font-size: .88rem;
+      cursor: pointer; transition: background .15s, box-shadow .15s;
     }
-    #preview-img {
-      max-width: 100%; max-height: 220px;
-      border-radius: 12px;
-      border: 1.5px solid var(--border);
-      object-fit: contain;
+    .btn-ar:hover { background: var(--accent-hover); box-shadow: 0 4px 16px rgba(0,113,227,.25); }
+    .btn-reset {
+      background: var(--off); color: var(--mid); border: 1px solid var(--border-light);
+      border-radius: 50px; padding: .7rem 1.4rem; font-family: 'Geist', sans-serif;
+      font-weight: 400; font-size: .85rem; cursor: pointer; transition: background .15s;
     }
-    #preview-name { font-size: .78rem; color: var(--muted); }
-    .preview-btns { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; }
+    .btn-reset:hover { background: var(--border-light); }
 
-    .btn-launch {
-      background: var(--accent);
-      color: var(--ink);
-      border: none; border-radius: 50px;
-      padding: .75rem 1.8rem;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 700; font-size: .9rem; letter-spacing: .02em;
-      cursor: pointer; transition: transform .15s, box-shadow .15s;
-    }
-    .btn-launch:hover { transform: scale(1.04); box-shadow: 0 0 24px rgba(184,240,74,.4); }
-    .btn-change {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .75rem 1.5rem;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500; font-size: .85rem;
-      cursor: pointer; transition: border-color .2s;
-    }
-    .btn-change:hover { border-color: rgba(255,255,255,.2); }
-
-    /* ── FOOTER ── */
+    /* ─── FOOTER ─── */
     footer {
-      padding: 3rem 2rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
+      border-top: 1px solid var(--border-light);
+      padding: 2.5rem 2rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
     }
-    .footer-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; }
-    .footer-logo span { color: var(--accent); }
-    footer p { font-size: .78rem; color: var(--muted); }
+    .footer-logo { font-weight: 600; font-size: .95rem; color: var(--ink); }
+    .footer-meta { font-size: .72rem; color: var(--soft); }
 
-    /* ── AR OVERLAY ── */
-    #ar-container {
-      display: none;
-      position: fixed; inset: 0;
-      z-index: 1000;
-      background: #000;
-    }
-    #cam-video {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
-    #ar-canvas {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-    }
+    /* ─── AR OVERLAY ─── */
+    #ar-container { display: none; position: fixed; inset: 0; z-index: 9000; background: #000; }
+    #cam-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    #ar-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
     #ar-image {
-      display: none;
-      position: absolute; left: 0; top: 0;
-      width: min(72vw, 420px); height: auto;
-      z-index: 150;
-      pointer-events: auto;
-      opacity: .97;
-      filter: drop-shadow(0 8px 32px rgba(0,0,0,.7));
-      touch-action: none;
-      transform-origin: 0 0;
-      user-select: none;
-      -webkit-user-select: none;
+      display: none; position: absolute; left: 0; top: 0;
+      width: min(72vw, 420px); height: auto; z-index: 150;
+      pointer-events: auto; opacity: .97;
+      filter: drop-shadow(0 8px 32px rgba(0,0,0,.5));
+      touch-action: none; transform-origin: 0 0;
+      user-select: none; -webkit-user-select: none;
     }
-    .ar-hud-top {
-      position: absolute; top: 0; left: 0; right: 0;
-      padding: 1rem 1.4rem;
-      background: linear-gradient(to bottom, rgba(0,0,0,.75), transparent);
-      display: flex; justify-content: space-between; align-items: center;
+    .ar-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.2rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
       z-index: 200;
     }
-    .ar-hud-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:.95rem; color: var(--accent); }
-    .ar-hud-status {
-      font-size:.65rem; color:rgba(255,255,255,.5);
-      letter-spacing:.12em; text-transform:uppercase;
-    }
-    .ar-hud-bottom {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 1.5rem;
-      background: linear-gradient(to top, rgba(0,0,0,.65), transparent);
+    .ar-brand { font-weight: 600; font-size: .85rem; color: rgba(255,255,255,.9); }
+    .ar-live { display: flex; align-items: center; gap: .35rem; font-size: .65rem; color: rgba(255,255,255,.5); letter-spacing: .08em; text-transform: uppercase; }
+    .live-dot { width:6px; height:6px; border-radius:50%; background:#34c759; animation: pdot 1.8s ease-in-out infinite; }
+    @keyframes pdot { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .ar-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem;
+      background: linear-gradient(to top, rgba(0,0,0,.5), transparent);
       text-align: center; z-index: 200; pointer-events: none;
     }
-    .ar-hud-hint { font-size:.72rem; color:rgba(255,255,255,.4); letter-spacing:.12em; text-transform:uppercase; }
+    .ar-hint { font-size: .68rem; color: rgba(255,255,255,.38); letter-spacing: .1em; text-transform: uppercase; }
     #close-ar {
-      position: absolute; top: 1rem; right: 1rem; z-index: 300;
-      width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(0,0,0,.8);
-      border: 1px solid rgba(255,255,255,.15);
-      color: #fff; font-size: 1.2rem;
+      position: absolute; top: 10px; right: 12px; z-index: 300;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.8); font-size: 1.1rem;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background .15s;
     }
-    #close-ar:hover { background: rgba(255,255,255,.1); }
+    #close-ar:hover { background: rgba(255,255,255,.12); }
 
-    /* Loading / Error */
     #ar-loading {
-      display: none; position: fixed; inset: 0; z-index: 9998;
-      background: var(--ink);
-      flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+      display: none; position: fixed; inset: 0; z-index: 9500;
+      background: var(--white);
+      flex-direction: column; align-items: center; justify-content: center; gap: .9rem;
     }
-    .spinner { width:44px; height:44px; border:2px solid rgba(184,240,74,.15); border-top-color:var(--accent); border-radius:50%; animation:spin .9s linear infinite; }
-    .loading-text { font-family:'Syne',sans-serif; font-size:.8rem; color:var(--muted); letter-spacing:.2em; text-transform:uppercase; }
+    .spinner { width:36px; height:36px; border:2px solid var(--border-light); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
-    #error-msg {
-      display:none; position:fixed; inset:0; z-index:9999;
-      background:var(--ink);
-      flex-direction:column; align-items:center; justify-content:center;
-      gap:1rem; padding:2rem; text-align:center;
-    }
-    #error-msg h2 { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--white); }
-    #error-msg p  { font-size:.85rem; color:var(--muted); line-height:1.6; max-width:320px; }
+    .loading-label { font-size: .78rem; color: var(--mid); }
 
-    /* Responsive */
-    @media (max-width: 640px) {
-      nav { padding: 1rem 1.2rem; }
-      section { padding: 4rem 1.2rem; }
-      .cases-grid { border-radius: 16px; }
+    #error-msg {
+      display: none; position: fixed; inset: 0; z-index: 9600;
+      background: var(--white);
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: .9rem; padding: 2rem; text-align: center;
     }
+    #error-msg h2 { font-family: 'Instrument Serif', serif; font-size: 1.5rem; font-weight: 400; }
+    #error-msg p { font-size: .85rem; color: var(--mid); line-height: 1.7; max-width: 320px; font-weight: 300; }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+    .revealed { opacity: 1; transform: none; }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <div class="nav-logo">AR<span>Drop</span></div>
-  <button class="nav-cta" onclick="document.getElementById('try-it').scrollIntoView({behavior:'smooth'})">Try Free →</button>
+  <div class="nav-logo">ARDrop</div>
+  <ul class="nav-links">
+    <li><a href="#use-cases">Use Cases</a></li>
+    <li><a href="#industries">Industries</a></li>
+    <li><a href="#demo">Demo</a></li>
+  </ul>
+  <a class="nav-cta" href="#demo">Try Free</a>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-glow2"></div>
-  <div class="hero-badge"><span class="badge-dot"></span> No app download required</div>
-  <h1>See it in your<br><em>space</em> before<br>you decide</h1>
-  <p class="hero-sub">Upload any image — furniture, art, fashion, medical diagrams — and view it overlaid on your live camera feed instantly. No install. No markers.</p>
-  <div class="hero-btns">
-    <button class="btn-primary" onclick="document.getElementById('try-it').scrollIntoView({behavior:'smooth'})">Try It Now</button>
-    <button class="btn-ghost" onclick="document.getElementById('use-cases').scrollIntoView({behavior:'smooth'})">See Use Cases</button>
+  <div class="hero-eyebrow">Instant AR · No App Required</div>
+  <h1>Place anything<br>in your <i>world.</i></h1>
+  <p class="hero-sub">Upload any image and see it live on your camera feed. Furniture, art, fashion, anatomy — experience it in your space before you decide.</p>
+  <div class="hero-actions">
+    <a class="btn-blue" href="#demo">Try it now</a>
+    <a class="btn-outline" href="#use-cases">See use cases</a>
   </div>
-  <div class="hero-tags">
-    <span class="tag">🪑 Furniture</span>
-    <span class="tag">🖼️ Art & Prints</span>
-    <span class="tag">⌚ Fashion</span>
-    <span class="tag">🫀 Anatomy</span>
-    <span class="tag">🏗️ Architecture</span>
-    <span class="tag">📦 Products</span>
+  <div class="hero-pills">
+    <span class="pill">🪑 Furniture</span>
+    <span class="pill">🖼 Art &amp; Prints</span>
+    <span class="pill">⌚ Fashion</span>
+    <span class="pill">🫀 Medical</span>
+    <span class="pill">🏗 Architecture</span>
+    <span class="pill">🍽 Restaurants</span>
   </div>
-</section>
-
-<!-- USE CASES (featured 4) -->
-<section id="use-cases">
-  <div class="cases-header">
-    <div class="section-label">Use Cases</div>
-    <h2 class="section-title">One tool, <em>infinite</em> applications</h2>
-  </div>
-
-  <div class="cases-grid">
-
-    <div class="case-card" onclick="loadSampleAndScroll('furniture')">
-      <div class="case-img-wrap">
-        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" alt="Modern sofa in living room" loading="lazy"/>
-        <div class="case-chip">Retail</div>
-      </div>
-      <div class="case-body">
-        <div class="case-icon">🪑</div>
-        <div class="case-name">Furniture & Home Decor</div>
-        <div class="case-desc">Let customers see how a sofa, lamp, or rug looks in their actual room before committing to a purchase.</div>
-        <span class="case-try">Try sample →</span>
-      </div>
-    </div>
-
-    <div class="case-card" onclick="loadSampleAndScroll('art')">
-      <div class="case-img-wrap">
-        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Abstract painting on wall" loading="lazy"/>
-        <div class="case-chip">Galleries</div>
-      </div>
-      <div class="case-body">
-        <div class="case-icon">🖼️</div>
-        <div class="case-name">Art & Wall Prints</div>
-        <div class="case-desc">Galleries and print sellers let buyers preview artwork on their actual wall — before checkout, not after delivery.</div>
-        <span class="case-try">Try sample →</span>
-      </div>
-    </div>
-
-    <div class="case-card" onclick="loadSampleAndScroll('fashion')">
-      <div class="case-img-wrap">
-        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Luxury watch product photo" loading="lazy"/>
-        <div class="case-chip">Fashion</div>
-      </div>
-      <div class="case-body">
-        <div class="case-icon">⌚</div>
-        <div class="case-name">Fashion Accessories</div>
-        <div class="case-desc">Try on watches, bags, jewellery, and sunglasses through your camera before you buy.</div>
-        <span class="case-try">Try sample →</span>
-      </div>
-    </div>
-
-    <div class="case-card" onclick="loadSampleAndScroll('anatomy')">
-      <div class="case-img-wrap">
-        <img src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&q=80" alt="Medical anatomy diagram" loading="lazy"/>
-        <div class="case-chip">Education</div>
-      </div>
-      <div class="case-body">
-        <div class="case-icon">🫀</div>
-        <div class="case-name">Anatomy & Medical</div>
-        <div class="case-desc">Overlay anatomical diagrams onto the body for immersive medical education, training, and patient consultations.</div>
-        <span class="case-try">Try sample →</span>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- MORE USE CASES -->
-<section id="more-cases">
-  <div style="max-width:1100px;margin:0 auto;">
-    <div class="section-label">More Industries</div>
-    <h2 class="section-title">Built for builders, <em>sellers</em> & educators</h2>
-    <div class="more-grid">
-      <div class="more-card"><div class="more-icon">🏠</div><div><div class="more-title">Real Estate</div><div class="more-text">Stage empty rooms or preview renovations during walkthroughs without lifting a hammer.</div></div></div>
-      <div class="more-card"><div class="more-icon">🎪</div><div><div class="more-title">Events & Photo Booths</div><div class="more-text">Add branded overlays, props, and themed frames to live camera at weddings and festivals.</div></div></div>
-      <div class="more-card"><div class="more-icon">🦷</div><div><div class="more-title">Healthcare & Clinics</div><div class="more-text">Show patients expected outcomes for cosmetic procedures overlaid onto their own image.</div></div></div>
-      <div class="more-card"><div class="more-icon">🔧</div><div><div class="more-title">Industrial & Field Work</div><div class="more-text">Technicians overlay repair schematics onto machinery in the field for guided maintenance.</div></div></div>
-      <div class="more-card"><div class="more-icon">🏛️</div><div><div class="more-title">Tourism & Heritage</div><div class="more-text">Overlay historical photos onto ruins or landmarks so visitors see the past layered onto the present.</div></div></div>
-      <div class="more-card"><div class="more-icon">🍽️</div><div><div class="more-title">Restaurant Menus</div><div class="more-text">Diners preview a dish in AR from the menu card before ordering — reduces buyer's remorse.</div></div></div>
-      <div class="more-card"><div class="more-icon">🎨</div><div><div class="more-title">Tattoo Studios</div><div class="more-text">Clients preview a tattoo design on their own skin before committing to the needle.</div></div></div>
-      <div class="more-card"><div class="more-icon">📦</div><div><div class="more-title">Product Launches</div><div class="more-text">Scan a poster or packaging and the product appears in 3D space — marketing that activates itself.</div></div></div>
+  <div class="hero-visual">
+    <div class="mockup-strip">
+      <div class="mockup-cell"><img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" alt="Furniture" loading="eager"/><span class="mockup-label">Furniture</span></div>
+      <div class="mockup-cell"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Wall Art" loading="eager"/><span class="mockup-label">Wall Art</span></div>
+      <div class="mockup-cell"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Fashion" loading="eager"/><span class="mockup-label">Fashion</span></div>
+      <div class="mockup-cell"><img src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&q=80" alt="Medical" loading="eager"/><span class="mockup-label">Medical</span></div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section id="how">
-  <div class="how-inner">
-    <div class="section-label">How it works</div>
-    <h2 class="section-title">Three steps,<br><em>zero</em> friction</h2>
-    <div class="steps-row">
-      <div class="step-card">
-        <div class="step-num">01</div>
-        <div class="step-title">Upload your image</div>
-        <div class="step-text">Tap the upload zone or drag any image — PNG, JPG, GIF, WebP. Or pick one of our samples.</div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">02</div>
-        <div class="step-title">Allow camera access</div>
-        <div class="step-text">One tap grants camera access. Works on any phone or desktop. HTTPS is handled automatically on Vercel.</div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">03</div>
-        <div class="step-title">Place it in your world</div>
-        <div class="step-text">Drag to reposition. Pinch or scroll to resize. Your image floats live over your camera feed.</div>
+<!-- USE CASES BENTO -->
+<div id="use-cases" class="section">
+  <div class="reveal">
+    <div class="section-tag">Use Cases</div>
+    <h2 class="section-h">One upload.<br><i>Infinite context.</i></h2>
+    <p class="section-body">From retail to healthcare, ARDrop turns any flat image into a live spatial experience — directly in your browser.</p>
+  </div>
+  <div class="bento reveal">
+    <div class="bento-card bc-1" onclick="loadSampleAndScroll('furniture')">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=80" alt="Sofa" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Retail · Home</div>
+        <div class="bento-name">Furniture &amp; Decor</div>
+        <div class="bento-desc">Let customers see a sofa, lamp, or rug in their actual room before checkout. Reduce returns, increase confidence.</div>
+        <span class="bento-cta">Try sample</span>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- TRY IT -->
-<section id="try-it">
-  <div style="text-align:center;margin-bottom:2.5rem;">
-    <div class="section-label">Live Demo</div>
-    <h2 class="section-title" style="margin:0 auto;">Try it <em>right now</em></h2>
-  </div>
-
-  <div class="try-wrap">
-    <div class="try-header">
-      <div class="try-title">ARDrop — Image Viewer</div>
-      <div class="try-sub">Upload your own image or pick a sample below</div>
+    <div class="bento-card bc-2" onclick="loadSampleAndScroll('art')">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=700&q=80" alt="Art" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Galleries · Print</div>
+        <div class="bento-name">Art &amp; Wall Prints</div>
+        <div class="bento-desc">Preview artwork on a real wall before buying. Built for galleries, Etsy sellers, and interior designers.</div>
+        <span class="bento-cta">Try sample</span>
+      </div>
     </div>
-    <div class="try-body">
-
-      <!-- Upload zone -->
-      <div id="upload-zone">
-        <input type="file" id="file-input" accept="image/*"/>
-        <div class="upload-icon">📁</div>
-        <div class="upload-label">Tap or drag an image here</div>
-        <div class="upload-hint">PNG · JPG · GIF · WebP</div>
+    <div class="bento-card bc-3" onclick="loadSampleAndScroll('fashion')">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Watch" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Fashion</div>
+        <div class="bento-name">Accessories</div>
+        <div class="bento-desc">Watches, bags, jewellery — visualised before purchase.</div>
+        <span class="bento-cta">Try sample</span>
       </div>
-
-      <!-- Sample images -->
-      <div class="samples-label">— or try a sample —</div>
-      <div class="samples-row">
-        <button class="sample-btn" onclick="loadSample('furniture')" id="sample-furniture">
-          <img class="sample-thumb" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=75" alt="Furniture"/>
-          <span class="sample-caption">Furniture</span>
-        </button>
-        <button class="sample-btn" onclick="loadSample('art')" id="sample-art">
-          <img class="sample-thumb" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=200&q=75" alt="Art"/>
-          <span class="sample-caption">Wall Art</span>
-        </button>
-        <button class="sample-btn" onclick="loadSample('fashion')" id="sample-fashion">
-          <img class="sample-thumb" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=75" alt="Watch"/>
-          <span class="sample-caption">Fashion</span>
-        </button>
-        <button class="sample-btn" onclick="loadSample('anatomy')" id="sample-anatomy">
-          <img class="sample-thumb" src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=200&q=75" alt="Anatomy"/>
-          <span class="sample-caption">Anatomy</span>
-        </button>
+    </div>
+    <div class="bento-card bc-4" onclick="loadSampleAndScroll('anatomy')">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&q=80" alt="Anatomy" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Education · Medical</div>
+        <div class="bento-name">Anatomy &amp; Training</div>
+        <div class="bento-desc">Overlay diagrams onto the body for immersive medical education and patient consultations.</div>
+        <span class="bento-cta">Try sample</span>
       </div>
-
-      <!-- Preview (after selection) -->
-      <div id="preview-wrap">
-        <img id="preview-img" alt="Preview"/>
-        <div id="preview-name"></div>
-        <div class="preview-btns">
-          <button class="btn-launch" onclick="launchAR()">📷 View in AR</button>
-          <button class="btn-change" onclick="resetUpload()">Change Image</button>
+    </div>
+    <div class="bento-card bc-5" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+      <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:1.8rem 1.6rem 1.6rem;">
+        <div>
+          <div class="bento-cat">Your Industry</div>
+          <div class="bento-name" style="font-size:1.5rem;margin-bottom:.6rem;">Upload<br>your own.</div>
+          <div class="bento-desc">Any PNG, JPG, GIF, or WebP. Works on mobile and desktop.</div>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <span style="display:inline-flex;align-items:center;gap:.4rem;background:var(--accent);color:#fff;border-radius:50px;padding:.55rem 1.2rem;font-size:.82rem;font-weight:500;">Upload Image ↑</span>
         </div>
       </div>
-
     </div>
   </div>
-</section>
+</div>
+
+<!-- INDUSTRIES -->
+<div class="section-full" id="industries">
+  <div class="section-full-inner">
+    <div class="reveal">
+      <div class="section-tag">More Industries</div>
+      <h2 class="section-h">Designed for<br>every <i>context.</i></h2>
+    </div>
+    <div class="industries-grid reveal">
+      <div class="ind-cell"><div class="ind-icon">🏠</div><div class="ind-name">Real Estate</div><div class="ind-text">Stage empty rooms or preview renovations during a live walkthrough — no furniture required.</div></div>
+      <div class="ind-cell"><div class="ind-icon">🎪</div><div class="ind-name">Events &amp; Photo Booths</div><div class="ind-text">Add branded overlays and themed props to live camera at weddings, festivals, and launches.</div></div>
+      <div class="ind-cell"><div class="ind-icon">🦷</div><div class="ind-name">Healthcare &amp; Clinics</div><div class="ind-text">Show patients expected outcomes for procedures overlaid onto their own image in real time.</div></div>
+      <div class="ind-cell"><div class="ind-icon">🔧</div><div class="ind-name">Industrial &amp; Field</div><div class="ind-text">Technicians overlay schematics onto machinery in the field for step-by-step guided repair.</div></div>
+      <div class="ind-cell"><div class="ind-icon">🏛</div><div class="ind-name">Tourism &amp; Heritage</div><div class="ind-text">Layer historical photographs onto ruins so visitors see the past alive in the present.</div></div>
+      <div class="ind-cell"><div class="ind-icon">🍽</div><div class="ind-name">Restaurant Menus</div><div class="ind-text">Diners preview a dish in AR before ordering — fewer surprises, higher satisfaction.</div></div>
+      <div class="ind-cell"><div class="ind-icon">🎨</div><div class="ind-name">Tattoo Studios</div><div class="ind-text">Clients preview a design on their skin before the needle touches.</div></div>
+      <div class="ind-cell"><div class="ind-icon">📦</div><div class="ind-name">Product Launches</div><div class="ind-text">Scan any poster and the product materialises in 3D space — marketing that activates itself.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DEMO -->
+<div id="demo" style="background:var(--white);padding:6rem 1.5rem;">
+  <div class="demo-inner">
+    <div class="demo-header reveal">
+      <div class="section-tag">Live Demo</div>
+      <h2 class="section-h" style="margin:0 auto;text-align:center;">See it <i>yourself.</i></h2>
+      <p class="section-body" style="margin:.8rem auto 0;text-align:center;max-width:400px;">Pick a sample or upload your own — then tap View in AR to place it live on your camera.</p>
+    </div>
+    <div class="demo-card reveal" style="margin-top:2rem;">
+      <div class="demo-card-head">
+        <div class="traffic-lights"><div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div></div>
+        <div class="demo-card-title">ARDrop — Image Viewer</div>
+      </div>
+      <div class="demo-body">
+        <div id="upload-zone">
+          <input type="file" id="file-input" accept="image/*"/>
+          <div class="upload-icon">⬆︎</div>
+          <div class="upload-label">Click or drag an image here</div>
+          <div class="upload-sub">PNG · JPG · GIF · WebP</div>
+        </div>
+        <div class="samples-divider"><span>or choose a sample</span></div>
+        <div class="samples-row">
+          <button class="sample-btn" onclick="loadSample('furniture')">
+            <img class="sample-thumb" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=75" alt="Furniture"/>
+            <span class="sample-cap">Furniture</span>
+          </button>
+          <button class="sample-btn" onclick="loadSample('art')">
+            <img class="sample-thumb" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=200&q=75" alt="Art"/>
+            <span class="sample-cap">Wall Art</span>
+          </button>
+          <button class="sample-btn" onclick="loadSample('fashion')">
+            <img class="sample-thumb" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=75" alt="Watch"/>
+            <span class="sample-cap">Fashion</span>
+          </button>
+          <button class="sample-btn" onclick="loadSample('anatomy')">
+            <img class="sample-thumb" src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=200&q=75" alt="Anatomy"/>
+            <span class="sample-cap">Anatomy</span>
+          </button>
+        </div>
+        <div id="preview-wrap">
+          <img id="preview-img" alt="Preview"/>
+          <div id="preview-name"></div>
+          <div class="preview-row">
+            <button class="btn-ar" onclick="launchAR()">View in AR</button>
+            <button class="btn-reset" onclick="resetUpload()">Change</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">AR<span>Drop</span></div>
-  <p>Upload any image. See it in your world.</p>
-  <p style="font-size:.72rem;">Works on mobile · Requires HTTPS · No install</p>
+  <div class="footer-logo">ARDrop</div>
+  <div class="footer-meta">Works on mobile · Requires HTTPS · No install needed</div>
+  <div class="footer-meta">Built for the open web</div>
 </footer>
 
 <!-- AR OVERLAY -->
@@ -767,87 +536,77 @@
   <video id="cam-video" autoplay playsinline muted></video>
   <canvas id="ar-canvas"></canvas>
   <img id="ar-image" alt="AR overlay"/>
-  <div class="ar-hud-top">
-    <div class="ar-hud-logo">ARDrop</div>
-    <div class="ar-hud-status">● Live</div>
+  <div class="ar-bar">
+    <div class="ar-brand">ARDrop</div>
+    <div class="ar-live"><span class="live-dot"></span> Live</div>
   </div>
-  <div class="ar-hud-bottom">
-    <div class="ar-hud-hint">Pinch to resize · Drag to move</div>
-  </div>
+  <div class="ar-footer"><div class="ar-hint">Pinch to resize · Drag to move</div></div>
   <button id="close-ar" onclick="closeAR()">✕</button>
 </div>
 
-<!-- LOADING -->
 <div id="ar-loading">
   <div class="spinner"></div>
-  <div class="loading-text">Starting camera…</div>
+  <div class="loading-label">Starting camera…</div>
 </div>
 
-<!-- ERROR -->
 <div id="error-msg">
-  <h2>Camera Access Required</h2>
-  <p id="error-detail">Please allow camera access and try again. Make sure you're on HTTPS.</p>
-  <button class="btn-change" onclick="dismissError()" style="margin-top:.8rem">Go Back</button>
+  <h2>Camera access needed</h2>
+  <p id="error-detail">Allow camera access in your browser settings and try again. HTTPS is required on mobile.</p>
+  <button class="btn-reset" onclick="dismissError()" style="margin-top:.6rem">Go back</button>
 </div>
 
 <script>
-  /* ── Sample images (Unsplash direct URLs) ── */
+  /* Scroll reveal */
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); ro.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
   const SAMPLES = {
-    furniture: { url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=85', name: 'Modern Sofa' },
-    art:       { url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&q=85', name: 'Abstract Wall Art' },
-    fashion:   { url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=85', name: 'Luxury Watch' },
-    anatomy:   { url: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=800&q=85', name: 'Anatomy Diagram' },
+    furniture: { url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=85', name: 'Modern Sofa' },
+    art:       { url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=900&q=85', name: 'Abstract Wall Art' },
+    fashion:   { url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=85', name: 'Luxury Watch' },
+    anatomy:   { url: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=900&q=85', name: 'Anatomy Diagram' },
   };
 
-  let uploadedDataURL = null;
-  let stream = null;
-  let animFrame = null;
+  let uploadedDataURL = null, stream = null, animFrame = null;
 
-  /* ── File input ── */
-  const fileInput  = document.getElementById('file-input');
+  const fileInput = document.getElementById('file-input');
   const uploadZone = document.getElementById('upload-zone');
 
-  fileInput.addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (file) handleFile(file);
-  });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
   uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
   uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
   uploadZone.addEventListener('drop', e => {
     e.preventDefault(); uploadZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) handleFile(file);
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) handleFile(f);
   });
 
   function handleFile(file) {
-    const reader = new FileReader();
-    reader.onload = ev => showPreview(ev.target.result, file.name);
-    reader.readAsDataURL(file);
+    const r = new FileReader();
+    r.onload = ev => showPreview(ev.target.result, file.name);
+    r.readAsDataURL(file);
   }
 
   function loadSample(key) {
     const s = SAMPLES[key];
-    // Fetch via canvas to convert cross-origin image to data URL
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-      canvas.getContext('2d').drawImage(img, 0, 0);
-      const dataURL = canvas.toDataURL('image/jpeg', .9);
-      showPreview(dataURL, s.name);
-      document.getElementById('try-it').scrollIntoView({ behavior: 'smooth' });
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      try { showPreview(c.toDataURL('image/jpeg', .9), s.name); }
+      catch { showPreview(s.url, s.name); }
     };
-    img.onerror = () => {
-      // Fallback: use URL directly if CORS blocks canvas
-      showPreview(s.url, s.name);
-      document.getElementById('try-it').scrollIntoView({ behavior: 'smooth' });
-    };
+    img.onerror = () => showPreview(s.url, s.name);
     img.src = s.url;
   }
 
   function loadSampleAndScroll(key) {
     loadSample(key);
+    setTimeout(() => document.getElementById('demo').scrollIntoView({ behavior: 'smooth' }), 80);
   }
 
   function showPreview(src, name) {
@@ -855,147 +614,110 @@
     document.getElementById('preview-img').src = src;
     document.getElementById('preview-name').textContent = name;
     document.getElementById('upload-zone').style.display = 'none';
-    document.querySelector('.samples-label').style.display = 'none';
+    document.querySelector('.samples-divider').style.display = 'none';
     document.querySelector('.samples-row').style.display = 'none';
     document.getElementById('preview-wrap').style.display = 'flex';
   }
 
   function resetUpload() {
-    uploadedDataURL = null;
-    fileInput.value = '';
+    uploadedDataURL = null; fileInput.value = '';
     document.getElementById('preview-wrap').style.display = 'none';
     document.getElementById('upload-zone').style.display = 'block';
-    document.querySelector('.samples-label').style.display = 'block';
+    document.querySelector('.samples-divider').style.display = 'flex';
     document.querySelector('.samples-row').style.display = 'flex';
   }
 
-  /* ── Launch AR ── */
   function launchAR() {
     if (!uploadedDataURL) return;
     document.body.style.overflow = 'hidden';
     document.getElementById('ar-loading').style.display = 'flex';
-
     navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
       audio: false
-    })
-    .then(s => {
+    }).then(s => {
       stream = s;
-      const video = document.getElementById('cam-video');
-      video.srcObject = stream;
-      video.onloadedmetadata = () => {
-        video.play();
+      const v = document.getElementById('cam-video');
+      v.srcObject = stream;
+      v.onloadedmetadata = () => {
+        v.play();
         document.getElementById('ar-loading').style.display = 'none';
         document.getElementById('ar-container').style.display = 'block';
-        const arImg = document.getElementById('ar-image');
-        arImg.src = uploadedDataURL;
-        arImg.style.display = 'block';
-        arImg.onload = () => initImageInteraction(arImg);
-        if (arImg.complete && arImg.naturalWidth) initImageInteraction(arImg);
+        const ai = document.getElementById('ar-image');
+        ai.src = uploadedDataURL; ai.style.display = 'block';
+        ai.onload = () => initInteraction(ai);
+        if (ai.complete && ai.naturalWidth) initInteraction(ai);
         startEffects();
       };
-    })
-    .catch(err => {
+    }).catch(err => {
       document.getElementById('ar-loading').style.display = 'none';
-      let detail = 'Please allow camera access and try again.';
-      if (err.name === 'NotAllowedError') detail = 'Camera permission was denied. Please allow it in your browser settings.';
-      else if (err.name === 'NotFoundError') detail = 'No camera found on this device.';
-      else if (location.protocol !== 'https:' && location.hostname !== 'localhost') detail = 'Camera requires HTTPS. Open this page over a secure connection.';
-      document.getElementById('error-detail').textContent = detail;
+      let msg = 'Allow camera access and try again.';
+      if (err.name === 'NotAllowedError') msg = 'Camera permission denied. Allow it in browser settings.';
+      else if (err.name === 'NotFoundError') msg = 'No camera found on this device.';
+      else if (location.protocol !== 'https:' && location.hostname !== 'localhost') msg = 'Camera requires HTTPS. Open this page over a secure connection.';
+      document.getElementById('error-detail').textContent = msg;
       document.getElementById('error-msg').style.display = 'flex';
     });
   }
 
-  /* ── Canvas effects ── */
   function startEffects() {
     const canvas = document.getElementById('ar-canvas');
     const ctx = canvas.getContext('2d');
     const t0 = performance.now();
-    const PARTICLES = Array.from({ length: 24 }, (_, i) => ({
-      x: Math.random(), y: Math.random(),
-      r: .8 + Math.random() * 1.4,
-      speed: .00008 + Math.random() * .00012,
-      phase: Math.random() * Math.PI * 2,
-      alpha: .12 + Math.random() * .28,
+    const P = Array.from({ length: 20 }, () => ({
+      x: Math.random(), y: Math.random(), r: .7 + Math.random() * 1.2,
+      speed: .00007 + Math.random() * .0001, phase: Math.random() * Math.PI * 2, a: .05 + Math.random() * .12,
     }));
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize(); window.addEventListener('resize', resize);
-    function draw(now) {
+    (function draw(now) {
       animFrame = requestAnimationFrame(draw);
-      const elapsed = (now - t0) / 1000;
-      const W = canvas.width, H = canvas.height;
+      const t = (now - t0) / 1000, W = canvas.width, H = canvas.height;
       ctx.clearRect(0, 0, W, H);
-      const vign = ctx.createRadialGradient(W/2,H/2,H*.15,W/2,H/2,H*.7);
-      vign.addColorStop(0,'rgba(0,0,0,0)'); vign.addColorStop(1,'rgba(0,0,0,.4)');
-      ctx.fillStyle = vign; ctx.fillRect(0,0,W,H);
-      PARTICLES.forEach(p => {
-        const y = ((p.y - elapsed * p.speed) % 1 + 1) % 1;
-        const x = p.x + .015 * Math.sin(elapsed * .4 + p.phase);
-        const a = p.alpha * (.7 + .3 * Math.sin(elapsed * 1.2 + p.phase));
-        ctx.beginPath();
-        ctx.arc(x * W, y * H, p.r, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(184,240,74,${a})`; ctx.fill();
+      const vg = ctx.createRadialGradient(W/2,H/2,H*.1,W/2,H/2,H*.68);
+      vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.35)');
+      ctx.fillStyle = vg; ctx.fillRect(0,0,W,H);
+      P.forEach(p => {
+        const y = ((p.y - t * p.speed) % 1 + 1) % 1;
+        const x = p.x + .012 * Math.sin(t * .35 + p.phase);
+        ctx.beginPath(); ctx.arc(x*W, y*H, p.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${p.a * (.6 + .4 * Math.sin(t + p.phase))})`; ctx.fill();
       });
-    }
-    animFrame = requestAnimationFrame(draw);
+    })(performance.now());
   }
 
-  /* ── Drag + pinch ── */
-  function initImageInteraction(el) {
-    const baseW = Math.min(window.innerWidth * .72, 420);
-    el.style.width = baseW + 'px';
-    let scale = 1;
-    let posX = (window.innerWidth - baseW) / 2;
-    let posY = window.innerHeight * .15;
-    let lastDist = null, lastMidX = null, lastMidY = null;
-    let dragSX = null, dragSY = null, dragOX = null, dragOY = null;
-    let mouseDown = false, mdOX = null, mdOY = null;
-
-    function apply() { el.style.transform = `translate(${posX}px,${posY}px) scale(${scale})`; }
+  function initInteraction(el) {
+    const bW = Math.min(window.innerWidth * .72, 420);
+    el.style.width = bW + 'px';
+    let sc = 1, px = (window.innerWidth - bW)/2, py = window.innerHeight * .15;
+    let lDist = null, lMx, lMy, dSx = null, dSy, dOx, dOy, md = false, mdOx, mdOy;
+    const apply = () => el.style.transform = `translate(${px}px,${py}px) scale(${sc})`;
     apply();
-
-    function dist(t) { const dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY; return Math.sqrt(dx*dx+dy*dy); }
-    function mid(t) { return { x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2 }; }
-
+    const dist = t => { const dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY; return Math.sqrt(dx*dx+dy*dy); };
+    const midp = t => ({ x:(t[0].clientX+t[1].clientX)/2, y:(t[0].clientY+t[1].clientY)/2 });
     el.addEventListener('touchstart', e => {
       e.preventDefault();
-      if (e.touches.length===2) { lastDist=dist(e.touches); const m=mid(e.touches); lastMidX=m.x; lastMidY=m.y; dragSX=null; }
-      else if (e.touches.length===1) { dragSX=e.touches[0].clientX; dragSY=e.touches[0].clientY; dragOX=posX; dragOY=posY; lastDist=null; }
+      if (e.touches.length===2) { lDist=dist(e.touches); const m=midp(e.touches); lMx=m.x; lMy=m.y; dSx=null; }
+      else { dSx=e.touches[0].clientX; dSy=e.touches[0].clientY; dOx=px; dOy=py; lDist=null; }
     }, {passive:false});
-
     el.addEventListener('touchmove', e => {
       e.preventDefault();
       if (e.touches.length===2) {
-        const d=dist(e.touches), m=mid(e.touches);
-        if (lastDist!==null) {
-          const r=d/lastDist, ns=Math.min(Math.max(scale*r,.2),6);
-          posX=lastMidX-(lastMidX-posX)*(ns/scale)+(m.x-lastMidX);
-          posY=lastMidY-(lastMidY-posY)*(ns/scale)+(m.y-lastMidY);
-          scale=ns;
-        }
-        lastDist=d; lastMidX=m.x; lastMidY=m.y; apply();
-      } else if (e.touches.length===1 && dragSX!==null) {
-        posX=dragOX+(e.touches[0].clientX-dragSX); posY=dragOY+(e.touches[0].clientY-dragSY); apply();
-      }
+        const d=dist(e.touches),m=midp(e.touches);
+        if (lDist) { const ns=Math.min(Math.max(sc*(d/lDist),.2),6); px=lMx-(lMx-px)*(ns/sc)+(m.x-lMx); py=lMy-(lMy-py)*(ns/sc)+(m.y-lMy); sc=ns; }
+        lDist=d; lMx=m.x; lMy=m.y; apply();
+      } else if (dSx!==null) { px=dOx+(e.touches[0].clientX-dSx); py=dOy+(e.touches[0].clientY-dSy); apply(); }
     }, {passive:false});
-
-    el.addEventListener('touchend', e => {
-      e.preventDefault();
-      if (e.touches.length<2) lastDist=null;
-      if (e.touches.length===0) dragSX=null;
-    }, {passive:false});
-
-    el.addEventListener('mousedown', e => { mouseDown=true; mdOX=e.clientX-posX; mdOY=e.clientY-posY; e.preventDefault(); });
-    window.addEventListener('mousemove', e => { if (!mouseDown) return; posX=e.clientX-mdOX; posY=e.clientY-mdOY; apply(); });
-    window.addEventListener('mouseup', () => { mouseDown=false; });
-    el.addEventListener('wheel', e => { e.preventDefault(); scale=Math.min(Math.max(scale*(e.deltaY>0?.9:1.1),.2),6); apply(); }, {passive:false});
+    el.addEventListener('touchend', e => { e.preventDefault(); if (e.touches.length<2) lDist=null; if (!e.touches.length) dSx=null; }, {passive:false});
+    el.addEventListener('mousedown', e => { md=true; mdOx=e.clientX-px; mdOy=e.clientY-py; e.preventDefault(); });
+    window.addEventListener('mousemove', e => { if (!md) return; px=e.clientX-mdOx; py=e.clientY-mdOy; apply(); });
+    window.addEventListener('mouseup', () => md=false);
+    el.addEventListener('wheel', e => { e.preventDefault(); sc=Math.min(Math.max(sc*(e.deltaY>0?.9:1.1),.2),6); apply(); }, {passive:false});
   }
 
   function closeAR() {
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame=null; }
     if (stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; }
-    const arImg=document.getElementById('ar-image');
-    arImg.style.display='none'; arImg.src='';
+    const ai=document.getElementById('ar-image'); ai.style.display='none'; ai.src='';
     document.getElementById('ar-container').style.display='none';
     document.body.style.overflow='auto';
   }
