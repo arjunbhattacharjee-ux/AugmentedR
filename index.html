@@ -241,18 +241,6 @@
     .bento-cta::after { content: '→'; transition: transform .15s; }
     .bento-card:hover .bento-cta::after { transform: translateX(3px); }
 
-    /* ─── INDUSTRIES ─── */
-    .industries-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 1px; border: 1px solid var(--border-light);
-      border-radius: var(--radius-lg); overflow: hidden; margin-top: 3rem;
-    }
-    .ind-cell { background: var(--white); padding: 1.6rem 1.5rem; transition: background .15s; }
-    .ind-cell:hover { background: #fafafa; }
-    .ind-icon { font-size: 1.5rem; margin-bottom: .7rem; }
-    .ind-name { font-weight: 500; font-size: .92rem; color: var(--ink); margin-bottom: .35rem; }
-    .ind-text { font-size: .78rem; color: var(--mid); line-height: 1.6; font-weight: 300; }
-
     /* ─── DEMO ─── */
     #demo { background: var(--white); padding: 6rem 1.5rem; }
     .demo-inner { max-width: 580px; margin: 0 auto; }
@@ -414,6 +402,7 @@
     <span class="pill">🫀 Medical</span>
     <span class="pill">🏗 Architecture</span>
     <span class="pill">🍽 Restaurants</span>
+    <span class="pill">🎨 Tattoo</span>
   </div>
   <div class="hero-visual">
     <div class="mockup-strip">
@@ -470,6 +459,33 @@
       </div>
     </div>
     <div class="bento-card bc-5" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1542327897-d73f4005b533?w=600&q=80" alt="Tattoo design preview" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Tattoo Studios</div>
+        <div class="bento-name">Skin Preview</div>
+        <div class="bento-desc">Clients preview a tattoo design on their actual skin before the needle touches — boosting confidence and reducing regret.</div>
+        <span class="bento-cta">Try it</span>
+      </div>
+    </div>
+    <div class="bento-card bc-4" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80" alt="Real estate room staging" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Real Estate</div>
+        <div class="bento-name">Virtual Staging</div>
+        <div class="bento-desc">Stage empty rooms or preview renovations during a live walkthrough — no furniture or contractor required.</div>
+        <span class="bento-cta">Try it</span>
+      </div>
+    </div>
+    <div class="bento-card bc-4" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+      <img class="bento-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Restaurant dish AR preview" loading="lazy"/>
+      <div class="bento-body">
+        <div class="bento-cat">Restaurants</div>
+        <div class="bento-name">Dish Preview</div>
+        <div class="bento-desc">Diners see a dish in AR before ordering — fewer surprises, more confident choices, higher satisfaction.</div>
+        <span class="bento-cta">Try it</span>
+      </div>
+    </div>
+    <div class="bento-card bc-4" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
       <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:1.8rem 1.6rem 1.6rem;">
         <div>
           <div class="bento-cat">Your Industry</div>
@@ -480,26 +496,6 @@
           <span style="display:inline-flex;align-items:center;gap:.4rem;background:var(--accent);color:#fff;border-radius:50px;padding:.55rem 1.2rem;font-size:.82rem;font-weight:500;">Upload Image ↑</span>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- INDUSTRIES -->
-<div class="section-full" id="industries">
-  <div class="section-full-inner">
-    <div class="reveal">
-      <div class="section-tag">More Industries</div>
-      <h2 class="section-h">Augmented reality<br>for every <i>context.</i></h2>
-    </div>
-    <div class="industries-grid reveal">
-      <div class="ind-cell"><div class="ind-icon">🏠</div><div class="ind-name">Real Estate</div><div class="ind-text">Stage empty rooms or preview renovations during a live walkthrough — no furniture required.</div></div>
-      <div class="ind-cell"><div class="ind-icon">🎪</div><div class="ind-name">Events &amp; Photo Booths</div><div class="ind-text">Add branded overlays and themed props to live camera at weddings, festivals, and launches.</div></div>
-      <div class="ind-cell"><div class="ind-icon">🦷</div><div class="ind-name">Healthcare &amp; Clinics</div><div class="ind-text">Show patients expected outcomes for procedures overlaid onto their own image in real time.</div></div>
-      <div class="ind-cell"><div class="ind-icon">🔧</div><div class="ind-name">Industrial &amp; Field</div><div class="ind-text">Technicians overlay schematics onto machinery in the field for step-by-step guided repair.</div></div>
-      <div class="ind-cell"><div class="ind-icon">🏛</div><div class="ind-name">Tourism &amp; Heritage</div><div class="ind-text">Layer historical photographs onto ruins so visitors see the past alive in the present.</div></div>
-      <div class="ind-cell"><div class="ind-icon">🍽</div><div class="ind-name">Restaurant Menus</div><div class="ind-text">Diners preview a dish in AR before ordering — fewer surprises, higher satisfaction.</div></div>
-      <div class="ind-cell"><div class="ind-icon">🎨</div><div class="ind-name">Tattoo Studios</div><div class="ind-text">Clients preview a design on their skin before the needle touches.</div></div>
-      <div class="ind-cell"><div class="ind-icon">📦</div><div class="ind-name">Product Launches</div><div class="ind-text">Scan any poster and the product materialises in 3D space — marketing that activates itself.</div></div>
     </div>
   </div>
 </div>
