@@ -260,13 +260,15 @@
     .demo-body { padding: 1.8rem 1.6rem; }
 
     #upload-zone,
-    #upload-zone-3d {
+    #upload-zone-3d,
+    #upload-zone-video {
       border: 1.5px dashed var(--border); border-radius: var(--radius-md);
       padding: 2.2rem 1.5rem; text-align: center; cursor: pointer;
       transition: border-color .2s, background .2s; position: relative; background: var(--white);
     }
     #upload-zone:hover, #upload-zone.drag-over,
-    #upload-zone-3d:hover, #upload-zone-3d.drag-over { border-color: var(--accent); background: rgba(0,113,227,.025); }
+    #upload-zone-3d:hover, #upload-zone-3d.drag-over,
+    #upload-zone-video:hover, #upload-zone-video.drag-over { border-color: var(--accent); background: rgba(0,113,227,.025); }
     #upload-zone input[type="file"] { position: absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
     .upload-icon { font-size: 2rem; margin-bottom: .5rem; opacity: .4; }
     .upload-label { font-weight: 500; font-size: .92rem; color: var(--ink); }
@@ -384,6 +386,7 @@
   <ul class="nav-links">
     <li><a href="#industries">Industries</a></li>
     <li><a href="#demo">Image AR</a></li>
+    <li><a href="#demo" onclick="setTimeout(()=>switchTab('video'),100)">Video AR</a></li>
     <li><a href="#demo" onclick="setTimeout(()=>switchTab('3d'),100)">3D Viewer</a></li>
   </ul>
   <a class="nav-cta" href="#demo">Try Free</a>
@@ -393,7 +396,7 @@
 <section id="hero">
   <div class="hero-eyebrow">Instant AR · No App Required</div>
   <h1>Place anything<br>in your <i>world.</i></h1>
-  <p class="hero-sub">ARDrop uses <strong>augmented reality (AR)</strong> — technology that overlays digital images onto your real-world camera feed. Upload any image and see it live in your space. Furniture, art, fashion, anatomy — experience it before you decide, directly in your browser.</p>
+  <p class="hero-sub">ARDrop uses <strong>augmented reality (AR)</strong> — technology that overlays digital content onto your real-world camera feed. Upload any image, video, or 3D model and see it live in your space. Furniture, art, fashion, anatomy — experience it before you decide, directly in your browser.</p>
   <div class="hero-actions">
     <a class="btn-blue" href="#demo">Try it now</a>
     <a class="btn-outline" href="#industries">See industries</a>
@@ -410,7 +413,7 @@
   </div>
   <div class="bento reveal">
     <div class="bento-card bc-1" onclick="loadSampleAndScroll('furniture')">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=80" alt="Sofa" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" alt="AR furniture placement — sofa in living room" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Retail · Home</div>
         <div class="bento-name">Furniture &amp; Decor</div>
@@ -419,7 +422,7 @@
       </div>
     </div>
     <div class="bento-card bc-2" onclick="loadSampleAndScroll('art')">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=700&q=80" alt="Art" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80" alt="AR art preview — colorful artwork on wall" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Galleries · Print</div>
         <div class="bento-name">Art &amp; Wall Prints</div>
@@ -428,7 +431,7 @@
       </div>
     </div>
     <div class="bento-card bc-3" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80" alt="Person placing themselves in a photo using AR" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80" alt="Group of friends posing at scenic spot — AR add yourself use case" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Personal · Creative</div>
         <div class="bento-name">Add Yourself in Any Image</div>
@@ -437,7 +440,7 @@
       </div>
     </div>
     <div class="bento-card bc-3" onclick="loadSampleAndScroll('fashion')">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Watch" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="AR watch try-on — wristwatch close up" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Fashion</div>
         <div class="bento-name">Accessories</div>
@@ -446,7 +449,7 @@
       </div>
     </div>
     <div class="bento-card bc-4" onclick="loadSampleAndScroll('anatomy')">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&q=80" alt="Anatomy" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&q=80" alt="AR anatomy overlay — medical model for education" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Education · Medical</div>
         <div class="bento-name">Anatomy &amp; Training</div>
@@ -455,7 +458,7 @@
       </div>
     </div>
     <div class="bento-card bc-5" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1542327897-d73f4005b533?w=600&q=80" alt="Tattoo design preview" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=600&q=80" alt="AR tattoo skin preview — tattoo design on forearm" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Tattoo Studios</div>
         <div class="bento-name">Skin Preview</div>
@@ -464,7 +467,7 @@
       </div>
     </div>
     <div class="bento-card bc-4" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80" alt="Real estate room staging" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80" alt="AR virtual staging — modern apartment room" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Real Estate</div>
         <div class="bento-name">Virtual Staging</div>
@@ -473,7 +476,7 @@
       </div>
     </div>
     <div class="bento-card bc-4" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
-      <img class="bento-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Restaurant dish AR preview" loading="lazy"/>
+      <img class="bento-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="AR dish preview — plated food on table" loading="lazy"/>
       <div class="bento-body">
         <div class="bento-cat">Restaurants</div>
         <div class="bento-name">Dish Preview</div>
@@ -504,13 +507,14 @@
     <div class="demo-header reveal" style="text-align:center;margin-bottom:2.5rem;">
       <div class="section-tag">Live Demo</div>
       <h2 class="section-h" style="margin:0 auto;text-align:center;">See it <i>yourself.</i></h2>
-      <p class="section-body" style="margin:.8rem auto 0;text-align:center;max-width:420px;">Two ways to experience AR — place a flat image in your space, or explore a full 3D model you can rotate and inspect.</p>
+      <p class="section-body" style="margin:.8rem auto 0;text-align:center;max-width:420px;">Three ways to experience AR — place a flat image in your space, overlay a looping video, or explore a full 3D model.</p>
     </div>
 
     <!-- Tab switcher -->
     <div class="reveal" style="display:flex;justify-content:center;margin-bottom:2rem;">
       <div style="display:inline-flex;background:var(--off);border-radius:50px;padding:4px;border:1px solid var(--border-light);">
         <button id="tab-img" onclick="switchTab('image')" style="background:var(--white);color:var(--ink);border:none;border-radius:50px;padding:.5rem 1.4rem;font-family:'Geist',sans-serif;font-weight:500;font-size:.85rem;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.08);">🖼 Image AR</button>
+        <button id="tab-video" onclick="switchTab('video')" style="background:transparent;color:var(--mid);border:none;border-radius:50px;padding:.5rem 1.4rem;font-family:'Geist',sans-serif;font-weight:500;font-size:.85rem;cursor:pointer;transition:all .2s;">▶ Video AR</button>
         <button id="tab-3d" onclick="switchTab('3d')" style="background:transparent;color:var(--mid);border:none;border-radius:50px;padding:.5rem 1.4rem;font-family:'Geist',sans-serif;font-weight:500;font-size:.85rem;cursor:pointer;transition:all .2s;">⬡ 3D Viewer</button>
       </div>
     </div>
@@ -559,6 +563,48 @@
       </div>
     </div>
 
+    <!-- VIDEO AR PANEL -->
+    <div id="panel-video" class="demo-card reveal" style="display:none;">
+      <div class="demo-card-head">
+        <div class="traffic-lights"><div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div></div>
+        <div class="demo-card-title">ARDrop — Video AR</div>
+        <span style="margin-left:auto;font-size:.68rem;color:var(--soft);background:var(--off);border-radius:50px;padding:.18rem .7rem;border:1px solid var(--border-light);">MP4 · WebM · MOV</span>
+      </div>
+      <div class="demo-body">
+        <div id="upload-zone-video">
+          <input type="file" id="file-input-video" accept="video/mp4,video/webm,video/quicktime,video/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"/>
+          <div class="upload-icon">▶</div>
+          <div class="upload-label">Click or drag a video here</div>
+          <div class="upload-sub">MP4 · WebM · MOV — max recommended 50 MB</div>
+        </div>
+        <div class="samples-divider" id="samples-divider-video"><span>or try a sample</span></div>
+        <div class="samples-row" id="samples-row-video">
+          <button class="sample-btn" onclick="loadVideoSample('product')">
+            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">⌚</div>
+            <span class="sample-cap">Product Demo</span>
+          </button>
+          <button class="sample-btn" onclick="loadVideoSample('nature')">
+            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">🌊</div>
+            <span class="sample-cap">Nature</span>
+          </button>
+        </div>
+        <div id="video-preview-wrap" style="display:none;flex-direction:column;align-items:center;gap:1rem;text-align:center;">
+          <video id="video-preview" style="max-width:100%;max-height:220px;border-radius:var(--radius-md);border:1px solid var(--border-light);object-fit:contain;background:#000;" muted loop playsinline></video>
+          <div id="video-preview-name" style="font-size:.75rem;color:var(--soft);"></div>
+          <div class="preview-row">
+            <button class="btn-ar" onclick="launchVideoAR()">View in AR</button>
+            <button class="btn-reset" onclick="resetVideoUpload()">Change</button>
+          </div>
+        </div>
+
+        <!-- Video info strip -->
+        <div style="margin-top:1.2rem;padding:.9rem 1rem;background:var(--off);border-radius:var(--radius-sm);border:1px solid var(--border-light);display:flex;gap:.6rem;align-items:flex-start;">
+          <span style="font-size:1rem;line-height:1;margin-top:1px;">ℹ️</span>
+          <p style="font-size:.75rem;color:var(--mid);line-height:1.6;font-weight:300;">Upload a video and overlay it on your camera feed. The video <strong style="font-weight:500;">loops automatically</strong> and can be dragged and resized just like an image. Works best with short clips under 50 MB.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- 3D VIEWER PANEL -->
     <div id="panel-3d" class="demo-card reveal" style="display:none;">
       <div class="demo-card-head">
@@ -584,14 +630,6 @@
           <button class="sample-btn" onclick="load3DSample('astronaut')">
             <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">🧑‍🚀</div>
             <span class="sample-cap">Astronaut</span>
-          </button>
-          <button class="sample-btn" onclick="load3DSample('robot')">
-            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">🤖</div>
-            <span class="sample-cap">Robot</span>
-          </button>
-          <button class="sample-btn" onclick="load3DSample('shoe')">
-            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">👟</div>
-            <span class="sample-cap">Shoe</span>
           </button>
         </div>
 
@@ -642,6 +680,7 @@
   <video id="cam-video" autoplay playsinline muted></video>
   <canvas id="ar-canvas"></canvas>
   <img id="ar-image" alt="AR overlay"/>
+  <video id="ar-video" muted loop playsinline style="display:none;position:absolute;left:0;top:0;width:min(72vw,420px);height:auto;z-index:150;pointer-events:auto;opacity:.97;filter:drop-shadow(0 8px 32px rgba(0,0,0,.5));touch-action:none;transform-origin:0 0;user-select:none;-webkit-user-select:none;"></video>
   <div class="ar-bar">
     <div class="ar-brand">ARDrop</div>
     <div class="ar-live"><span class="live-dot"></span> Live</div>
@@ -824,6 +863,7 @@
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame=null; }
     if (stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; }
     const ai=document.getElementById('ar-image'); ai.style.display='none'; ai.src='';
+    const av=document.getElementById('ar-video'); av.pause(); av.style.display='none'; av.removeAttribute('src'); av.load();
     document.getElementById('ar-container').style.display='none';
     document.body.style.overflow='auto';
   }
@@ -835,24 +875,113 @@
 
   /* ── TAB SWITCHING ── */
   function switchTab(tab) {
-    const isImg = tab === 'image';
-    document.getElementById('panel-image').style.display = isImg ? 'block' : 'none';
-    document.getElementById('panel-3d').style.display = isImg ? 'none' : 'block';
-    const tImg = document.getElementById('tab-img');
-    const t3d  = document.getElementById('tab-3d');
-    tImg.style.background = isImg ? 'var(--white)' : 'transparent';
-    tImg.style.color       = isImg ? 'var(--ink)'   : 'var(--mid)';
-    tImg.style.boxShadow   = isImg ? '0 1px 4px rgba(0,0,0,.08)' : 'none';
-    t3d.style.background   = isImg ? 'transparent'  : 'var(--white)';
-    t3d.style.color        = isImg ? 'var(--mid)'   : 'var(--ink)';
-    t3d.style.boxShadow    = isImg ? 'none' : '0 1px 4px rgba(0,0,0,.08)';
+    const panels = { image: 'panel-image', video: 'panel-video', '3d': 'panel-3d' };
+    const tabs   = { image: 'tab-img',     video: 'tab-video',   '3d': 'tab-3d' };
+    Object.keys(panels).forEach(k => {
+      const isActive = k === tab;
+      document.getElementById(panels[k]).style.display = isActive ? 'block' : 'none';
+      const btn = document.getElementById(tabs[k]);
+      btn.style.background = isActive ? 'var(--white)' : 'transparent';
+      btn.style.color      = isActive ? 'var(--ink)'   : 'var(--mid)';
+      btn.style.boxShadow  = isActive ? '0 1px 4px rgba(0,0,0,.08)' : 'none';
+    });
+  }
+
+  /* ── VIDEO AR ── */
+  let uploadedVideoURL = null;
+
+  const VIDEO_SAMPLES = {
+    product: { url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', name: 'Product Demo' },
+    nature:  { url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', name: 'Nature Clip' },
+  };
+
+  const fileInputVideo = document.getElementById('file-input-video');
+  const uploadZoneVideo = document.getElementById('upload-zone-video');
+
+  fileInputVideo.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) handleVideoFile(f);
+  });
+
+  uploadZoneVideo.addEventListener('dragover', e => { e.preventDefault(); uploadZoneVideo.classList.add('drag-over'); });
+  uploadZoneVideo.addEventListener('dragleave', () => uploadZoneVideo.classList.remove('drag-over'));
+  uploadZoneVideo.addEventListener('drop', e => {
+    e.preventDefault(); uploadZoneVideo.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('video/')) handleVideoFile(f);
+  });
+
+  function handleVideoFile(file) {
+    uploadedVideoURL = URL.createObjectURL(file);
+    showVideoPreview(uploadedVideoURL, file.name);
+  }
+
+  function loadVideoSample(key) {
+    const s = VIDEO_SAMPLES[key];
+    uploadedVideoURL = s.url;
+    showVideoPreview(s.url, s.name);
+  }
+
+  function showVideoPreview(src, name) {
+    const vp = document.getElementById('video-preview');
+    vp.src = src;
+    vp.play().catch(() => {});
+    document.getElementById('video-preview-name').textContent = name;
+    document.getElementById('upload-zone-video').style.display = 'none';
+    document.getElementById('samples-divider-video').style.display = 'none';
+    document.getElementById('samples-row-video').style.display = 'none';
+    document.getElementById('video-preview-wrap').style.display = 'flex';
+  }
+
+  function resetVideoUpload() {
+    if (uploadedVideoURL && uploadedVideoURL.startsWith('blob:')) { URL.revokeObjectURL(uploadedVideoURL); }
+    uploadedVideoURL = null;
+    fileInputVideo.value = '';
+    const vp = document.getElementById('video-preview');
+    vp.pause(); vp.removeAttribute('src'); vp.load();
+    document.getElementById('video-preview-wrap').style.display = 'none';
+    document.getElementById('upload-zone-video').style.display = 'block';
+    document.getElementById('samples-divider-video').style.display = 'flex';
+    document.getElementById('samples-row-video').style.display = 'flex';
+  }
+
+  function launchVideoAR() {
+    if (!uploadedVideoURL) return;
+    document.body.style.overflow = 'hidden';
+    document.getElementById('ar-loading').style.display = 'flex';
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    }).then(s => {
+      stream = s;
+      const v = document.getElementById('cam-video');
+      v.srcObject = stream;
+      v.onloadedmetadata = () => {
+        v.play();
+        document.getElementById('ar-loading').style.display = 'none';
+        document.getElementById('ar-container').style.display = 'block';
+        const av = document.getElementById('ar-video');
+        av.src = uploadedVideoURL;
+        av.style.display = 'block';
+        av.play().catch(() => {});
+        av.onloadeddata = () => initInteraction(av);
+        if (av.readyState >= 2) initInteraction(av);
+        startEffects();
+      };
+    }).catch(err => {
+      document.getElementById('ar-loading').style.display = 'none';
+      let msg = 'Allow camera access and try again.';
+      if (err.name === 'NotAllowedError') msg = 'Camera permission denied. Allow it in browser settings.';
+      else if (err.name === 'NotFoundError') msg = 'No camera found on this device.';
+      else if (location.protocol !== 'https:' && location.hostname !== 'localhost') msg = 'Camera requires HTTPS. Open this page over a secure connection.';
+      document.getElementById('error-detail').textContent = msg;
+      document.getElementById('error-msg').style.display = 'flex';
+    });
   }
 
   /* ── 3D SAMPLES ── */
   const SAMPLES_3D = {
     astronaut: { url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', name: 'Astronaut' },
-    robot:     { url: 'https://modelviewer.dev/shared-assets/models/RobotExpressive.glb', name: 'Robot' },
-    shoe:      { url: 'https://modelviewer.dev/shared-assets/models/glTF-Sample-Assets/MaterialsVariantsShoe.glb', name: 'Shoe' },
   };
 
   const fileInput3d = document.getElementById('file-input-3d');
