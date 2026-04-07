@@ -37,6 +37,7 @@
   }
   </script>
 
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -259,12 +260,14 @@
     .demo-card-title { font-size: .78rem; color: var(--mid); }
     .demo-body { padding: 1.8rem 1.6rem; }
 
-    #upload-zone {
+    #upload-zone,
+    #upload-zone-3d {
       border: 1.5px dashed var(--border); border-radius: var(--radius-md);
       padding: 2.2rem 1.5rem; text-align: center; cursor: pointer;
       transition: border-color .2s, background .2s; position: relative; background: var(--white);
     }
-    #upload-zone:hover, #upload-zone.drag-over { border-color: var(--accent); background: rgba(0,113,227,.025); }
+    #upload-zone:hover, #upload-zone.drag-over,
+    #upload-zone-3d:hover, #upload-zone-3d.drag-over { border-color: var(--accent); background: rgba(0,113,227,.025); }
     #upload-zone input[type="file"] { position: absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
     .upload-icon { font-size: 2rem; margin-bottom: .5rem; opacity: .4; }
     .upload-label { font-weight: 500; font-size: .92rem; color: var(--ink); }
@@ -381,7 +384,8 @@
   <div class="nav-logo">ARDrop</div>
   <ul class="nav-links">
     <li><a href="#industries">Industries</a></li>
-    <li><a href="#demo">Demo</a></li>
+    <li><a href="#demo">Image AR</a></li>
+    <li><a href="#demo" onclick="setTimeout(()=>switchTab('3d'),100)">3D Viewer</a></li>
   </ul>
   <a class="nav-cta" href="#demo">Try Free</a>
 </nav>
@@ -502,16 +506,29 @@
 
 <!-- DEMO -->
 <div id="demo" style="background:var(--white);padding:6rem 1.5rem;">
-  <div class="demo-inner">
-    <div class="demo-header reveal">
+  <div style="max-width:760px;margin:0 auto;">
+
+    <!-- Header -->
+    <div class="demo-header reveal" style="text-align:center;margin-bottom:2.5rem;">
       <div class="section-tag">Live Demo</div>
       <h2 class="section-h" style="margin:0 auto;text-align:center;">See it <i>yourself.</i></h2>
-      <p class="section-body" style="margin:.8rem auto 0;text-align:center;max-width:400px;">Pick a sample or upload your own — then tap View in AR to place it live on your camera.</p>
+      <p class="section-body" style="margin:.8rem auto 0;text-align:center;max-width:420px;">Two ways to experience AR — place a flat image in your space, or explore a full 3D model you can rotate and inspect.</p>
     </div>
-    <div class="demo-card reveal" style="margin-top:2rem;">
+
+    <!-- Tab switcher -->
+    <div class="reveal" style="display:flex;justify-content:center;margin-bottom:2rem;">
+      <div style="display:inline-flex;background:var(--off);border-radius:50px;padding:4px;border:1px solid var(--border-light);">
+        <button id="tab-img" onclick="switchTab('image')" style="background:var(--white);color:var(--ink);border:none;border-radius:50px;padding:.5rem 1.4rem;font-family:'Geist',sans-serif;font-weight:500;font-size:.85rem;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.08);">🖼 Image AR</button>
+        <button id="tab-3d" onclick="switchTab('3d')" style="background:transparent;color:var(--mid);border:none;border-radius:50px;padding:.5rem 1.4rem;font-family:'Geist',sans-serif;font-weight:500;font-size:.85rem;cursor:pointer;transition:all .2s;">⬡ 3D Viewer</button>
+      </div>
+    </div>
+
+    <!-- IMAGE AR PANEL -->
+    <div id="panel-image" class="demo-card reveal">
       <div class="demo-card-head">
         <div class="traffic-lights"><div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div></div>
-        <div class="demo-card-title">ARDrop — Image Viewer</div>
+        <div class="demo-card-title">ARDrop — Image AR</div>
+        <span style="margin-left:auto;font-size:.68rem;color:var(--soft);background:var(--off);border-radius:50px;padding:.18rem .7rem;border:1px solid var(--border-light);">PNG · JPG · GIF · WebP</span>
       </div>
       <div class="demo-body">
         <div id="upload-zone">
@@ -549,6 +566,75 @@
         </div>
       </div>
     </div>
+
+    <!-- 3D VIEWER PANEL -->
+    <div id="panel-3d" class="demo-card reveal" style="display:none;">
+      <div class="demo-card-head">
+        <div class="traffic-lights"><div class="tl tl-r"></div><div class="tl tl-y"></div><div class="tl tl-g"></div></div>
+        <div class="demo-card-title">ARDrop — 3D Viewer</div>
+        <span style="margin-left:auto;font-size:.68rem;color:var(--soft);background:var(--off);border-radius:50px;padding:.18rem .7rem;border:1px solid var(--border-light);">GLB · GLTF</span>
+      </div>
+      <div class="demo-body">
+
+        <!-- 3D Upload zone -->
+        <div id="upload-zone-3d">
+          <input type="file" id="file-input-3d" accept=".glb,.gltf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"/>
+          <div class="upload-icon">⬡</div>
+          <div class="upload-label">Click or drag a 3D model here</div>
+          <div class="upload-sub">GLB · GLTF</div>
+        </div>
+
+        <!-- 3D sample divider -->
+        <div class="samples-divider" id="samples-divider-3d"><span>or try a sample model</span></div>
+
+        <!-- 3D sample buttons -->
+        <div class="samples-row" id="samples-row-3d">
+          <button class="sample-btn" onclick="load3DSample('astronaut')">
+            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">🧑‍🚀</div>
+            <span class="sample-cap">Astronaut</span>
+          </button>
+          <button class="sample-btn" onclick="load3DSample('horse')">
+            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">🐎</div>
+            <span class="sample-cap">Horse</span>
+          </button>
+          <button class="sample-btn" onclick="load3DSample('duck')">
+            <div class="sample-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off);">🦆</div>
+            <span class="sample-cap">Duck</span>
+          </button>
+        </div>
+
+        <!-- model-viewer container (hidden until model loaded) -->
+        <div id="model-wrap" style="display:none;flex-direction:column;align-items:center;gap:1rem;">
+          <div style="width:100%;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-light);background:#f0f0f5;position:relative;">
+            <model-viewer
+              id="model-viewer"
+              alt="3D model"
+              auto-rotate
+              camera-controls
+              ar
+              ar-modes="webxr scene-viewer quick-look"
+              shadow-intensity="1"
+              style="width:100%;height:340px;--progress-bar-color:var(--accent);"
+            ></model-viewer>
+            <!-- Rotate hint badge -->
+            <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.45);backdrop-filter:blur(8px);color:rgba(255,255,255,.85);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .75rem;border-radius:50px;pointer-events:none;white-space:nowrap;">Drag to rotate · Pinch to zoom</div>
+          </div>
+          <div id="model-name-3d" style="font-size:.75rem;color:var(--soft);"></div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;">
+            <button class="btn-ar" onclick="launch3DAR()">View in AR</button>
+            <button class="btn-reset" onclick="reset3D()">Change</button>
+          </div>
+        </div>
+
+        <!-- 3D info strip -->
+        <div style="margin-top:1.2rem;padding:.9rem 1rem;background:var(--off);border-radius:var(--radius-sm);border:1px solid var(--border-light);display:flex;gap:.6rem;align-items:flex-start;">
+          <span style="font-size:1rem;line-height:1;margin-top:1px;">ℹ️</span>
+          <p style="font-size:.75rem;color:var(--mid);line-height:1.6;font-weight:300;">AR mode opens natively on supported devices — iOS uses Quick Look, Android uses Scene Viewer. No app required. For best results use <strong style="font-weight:500;">.glb</strong> files under 15 MB.</p>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -753,6 +839,77 @@
   function dismissError() {
     document.getElementById('error-msg').style.display='none';
     document.body.style.overflow='auto';
+  }
+
+  /* ── TAB SWITCHING ── */
+  function switchTab(tab) {
+    const isImg = tab === 'image';
+    document.getElementById('panel-image').style.display = isImg ? 'block' : 'none';
+    document.getElementById('panel-3d').style.display = isImg ? 'none' : 'block';
+    const tImg = document.getElementById('tab-img');
+    const t3d  = document.getElementById('tab-3d');
+    tImg.style.background = isImg ? 'var(--white)' : 'transparent';
+    tImg.style.color       = isImg ? 'var(--ink)'   : 'var(--mid)';
+    tImg.style.boxShadow   = isImg ? '0 1px 4px rgba(0,0,0,.08)' : 'none';
+    t3d.style.background   = isImg ? 'transparent'  : 'var(--white)';
+    t3d.style.color        = isImg ? 'var(--mid)'   : 'var(--ink)';
+    t3d.style.boxShadow    = isImg ? 'none' : '0 1px 4px rgba(0,0,0,.08)';
+  }
+
+  /* ── 3D SAMPLES ── */
+  const SAMPLES_3D = {
+    astronaut: { url: 'https://modelviewer.dev/shared-assets/models/Astronaut.glb', name: 'Astronaut' },
+    horse:     { url: 'https://modelviewer.dev/shared-assets/models/Horse.glb',     name: 'Horse' },
+    duck:      { url: 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Duck/glTF-Binary/Duck.glb', name: 'Duck' },
+  };
+
+  const fileInput3d = document.getElementById('file-input-3d');
+  fileInput3d.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) show3DModel(URL.createObjectURL(f), f.name);
+  });
+
+  const uploadZone3d = document.getElementById('upload-zone-3d');
+  uploadZone3d.addEventListener('dragover', e => { e.preventDefault(); uploadZone3d.classList.add('drag-over'); });
+  uploadZone3d.addEventListener('dragleave', () => uploadZone3d.classList.remove('drag-over'));
+  uploadZone3d.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone3d.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && (f.name.endsWith('.glb') || f.name.endsWith('.gltf'))) show3DModel(URL.createObjectURL(f), f.name);
+  });
+
+  function load3DSample(key) {
+    const s = SAMPLES_3D[key];
+    show3DModel(s.url, s.name);
+  }
+
+  function show3DModel(src, name) {
+    const mv = document.getElementById('model-viewer');
+    mv.src = src;
+    document.getElementById('model-name-3d').textContent = name;
+    document.getElementById('upload-zone-3d').style.display = 'none';
+    document.getElementById('samples-divider-3d').style.display = 'none';
+    document.getElementById('samples-row-3d').style.display = 'none';
+    document.getElementById('model-wrap').style.display = 'flex';
+  }
+
+  function reset3D() {
+    const mv = document.getElementById('model-viewer');
+    mv.src = '';
+    document.getElementById('upload-zone-3d').style.display = 'block';
+    document.getElementById('samples-divider-3d').style.display = 'flex';
+    document.getElementById('samples-row-3d').style.display = 'flex';
+    document.getElementById('model-wrap').style.display = 'none';
+    fileInput3d.value = '';
+  }
+
+  function launch3DAR() {
+    const mv = document.getElementById('model-viewer');
+    if (mv && mv.canActivateAR) {
+      mv.activateAR();
+    } else {
+      alert('AR is not supported on this device or browser. Try on an Android (Chrome) or iOS (Safari) device.');
+    }
   }
 </script>
 </body>
